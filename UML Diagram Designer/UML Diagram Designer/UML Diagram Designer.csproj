@@ -7,4 +7,13 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="viewmodel\" />
+    <Folder Include="view\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MetaDslx.Languages.Uml-v2.5.1" Version="0.2.41" />
+  </ItemGroup>
+
 </Project>

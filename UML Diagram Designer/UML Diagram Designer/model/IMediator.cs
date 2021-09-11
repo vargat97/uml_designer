@@ -4,7 +4,9 @@ using System.Text;
 
 namespace UML_Diagram_Designer.model
 {
-    interface Mediator
+    //TODO
+    public interface IMediator
     {
+        public void Notify(BaseComponent sender);
     }
 }
