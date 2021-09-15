@@ -1,0 +1,17 @@
+﻿<Window x:Class="DiagramDesigner.View.AddEnumKindsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DiagramDesigner.View"
+             mc:Ignorable="d" 
+              Width="347.934" Height="417.066" Background="White"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <TextBlock HorizontalAlignment="Left" Margin="10,157,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="121" RenderTransformOrigin="0.538,-2.002"><Run Text="Enum kind name:"/><LineBreak/><Run/></TextBlock>
+        <TextBox x:Name="NameEnumTextbox" Text="{Binding Path=EnumKindName}"  HorizontalAlignment="Left" Height="23" Margin="120,157,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="164" />
+        <Button Content="Add/Edit" HorizontalAlignment="Left" Margin="188,342,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click" />
+        <Button Content="Remove" HorizontalAlignment="Left" Margin="32,342,0,0" VerticalAlignment="Top" Width="75" Click="RemoveButton_Click"/>
+
+    </Grid>
+</Window>
