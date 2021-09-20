@@ -8,7 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="viewmodel\" />
+    <Compile Remove="viewmodel\**" />
+    <EmbeddedResource Remove="viewmodel\**" />
+    <None Remove="viewmodel\**" />
+    <Page Remove="viewmodel\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="view\" />
   </ItemGroup>
 

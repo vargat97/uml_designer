@@ -1,9 +1,6 @@
 ﻿using DiagramDesigner.Model;
 using MetaDslx.GraphViz;
-using MetaDslx.Languages.Uml.Model;
-using MetaDslx.Languages.Uml.Serialization;
-using MetaDslx.Modeling;
-
+using UML_Diagram_Designer.Controller;
 
 namespace DiagramDesigner.Controller
 {
@@ -13,12 +10,6 @@ namespace DiagramDesigner.Controller
         private  GraphLayoutModel graphLayoutModel;
         private UmlFactory factory;
 
-        //public Controller(UMLModel model,GraphLayoutModel graphLayoutModel)
-        //{
-        //    this.model = model;
-        //    this.graphLayoutModel = graphLayoutModel;
-        //    factory = new UmlFactory(model.Model.ToMutable());
-        //}
         public Controller()
         {
 
@@ -482,4 +473,29 @@ namespace DiagramDesigner.Controller
 
     }
 
+
+    public class DiagramController
+    {
+
+        private Connector _connector;
+
+        public Connector Connector
+        {
+            get { return this._connector; }
+        }
+
+        public DiagramController(Connector connector)
+        {
+            this._connector = connector;
+        }
+
+        public bool Open()
+        {
+            if (this._connector.Equals(null)) return false;
+
+            this._connector.ConnectUMLModelAndGraphLayout();
+            return true;
+        }
+
+    }
 }
