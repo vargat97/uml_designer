@@ -2,9 +2,10 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:UML_Diagram_Designer"
-             xmlns:controller="clr-namespace:DiagramDesigner.Controller"
+             xmlns:controller="clr-namespace:UML_Diagram_Designer.Controller"
              StartupUri="./View/MainWindow.xaml">
     <Application.Resources>
+        <!--
         <controller:MultiValueConverter x:Key="MultiValueConverter"></controller:MultiValueConverter>
         <DataTemplate x:Key="ClassNodeTemplate">
             <Grid DataContext="{Binding Path=MyNodeBindingHelper}">
@@ -60,6 +61,6 @@
             </Grid>
         </DataTemplate>
 
-
+        -->
     </Application.Resources>
 </Application>

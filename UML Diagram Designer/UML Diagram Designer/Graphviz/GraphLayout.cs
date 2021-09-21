@@ -20,7 +20,6 @@ namespace MetaDslx.GraphViz
 
         private IntPtr _graph;
 
-        //private IntPtr _graphDpiAttribute;
         internal IntPtr _graphBbAttribute;
         internal IntPtr _graphRankSepAttribute;
         internal IntPtr _graphNodeSepAttribute;
@@ -51,7 +50,6 @@ namespace MetaDslx.GraphViz
             _objectToNodeMap = new Dictionary<object, NodeLayout>();
             _objectToEdgeMap = new Dictionary<object, EdgeLayout>();
 
-            //_graphDpiAttribute = CGraphLib.agattr(_graph, CGraphLib.AGRAPH, "dpi", "72");
             _graphBbAttribute = CGraphLib.agattr(_graph, CGraphLib.AGRAPH, "bb", "");
             _graphRankSepAttribute = CGraphLib.agattr(_graph, CGraphLib.AGRAPH, "ranksep", "2");
             _graphNodeSepAttribute = CGraphLib.agattr(_graph, CGraphLib.AGRAPH, "nodesep", "1");
@@ -155,16 +153,12 @@ namespace MetaDslx.GraphViz
                 }
                 else
                 {
-                    //CGraphLib.agxset(node.GraphVizSubGraph, _nodePosAttribute, "");
-                    //CGraphLib.agxset(node.GraphVizSubGraph, _nodeWidthAttribute, "");
-                    //CGraphLib.agxset(node.GraphVizSubGraph, _nodeHeightAttribute, "");
                     CGraphLib.agxset(node.GraphVizSubGraph, _graphMarginAttribute, (this.NodeMargin * DefaultDpi).ToString());
                 }
             }
             CGraphLib.agxset(_graph, _graphNodeSepAttribute, this.NodeSeparation.ToString());
             CGraphLib.agxset(_graph, _graphRankSepAttribute, this.RankSeparation.ToString());
             CGraphLib.agxset(_graph, _graphLenAttribute, this.EdgeLength.ToString());
-            //CGraphLib.agxset(_graph, _graphMarginAttribute, this.NodeMargin.ToString());
             _dot = GraphVizLib.Instance.Layout(_graph, _engine);
             var graphBb = Marshal.PtrToStringAnsi(CGraphLib.agxget(_graph, _graphBbAttribute));
             if (!string.IsNullOrEmpty(graphBb))

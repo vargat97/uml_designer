@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DiagramDesigner.Model
+namespace UML_Diagram_Designer.Model
 {
     public class UMLModel
     {
@@ -31,6 +31,11 @@ namespace DiagramDesigner.Model
             }
         }
 
+        public UMLModel()
+        {
+            var model = new MutableModel();
+            Model = model.ToImmutable();
+        }
         public List<ImmutableObject> GetTypesFromModel()
         {
             if (this.typesArray != null)

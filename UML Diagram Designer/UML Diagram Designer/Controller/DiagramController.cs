@@ -1,9 +1,38 @@
-﻿using DiagramDesigner.Model;
-using MetaDslx.GraphViz;
-using UML_Diagram_Designer.Controller;
-
-namespace DiagramDesigner.Controller
+﻿namespace UML_Diagram_Designer.Controller
 {
+    public class DiagramController
+    {
+
+        private Connector _connector;
+
+        public Connector Connector
+        {
+            get { return this._connector; }
+        }
+
+        public DiagramController(Connector connector)
+        {
+            this._connector = connector;
+        }
+
+        public bool Open()
+        {
+
+            this._connector.ConnectUMLModelAndGraphLayout();
+            return true;
+        }
+
+        public bool Create()
+        {
+            this._connector.ConnectUMLModelAndGraphLayout();
+            return true;
+        }
+    }
+
+
+
+
+    /*
     public class Controller
     {
         private  UMLModel model;
@@ -167,6 +196,7 @@ namespace DiagramDesigner.Controller
           this.Model = mutableModel.ToImmutable();
       }
         */
+    /*
       public void SetOperationToClass(ImmutableObject classObject, ImmutableObject operationObject)
       {
           var mutableModel = this.model.Model.ToMutable();
@@ -275,6 +305,7 @@ namespace DiagramDesigner.Controller
               //END INTERFACE realted SET methods
       //END INTERFACE related methods
     */
+    /*
       public ImmutableObject CreateParameter(string parameterName)
       {
           var mutableModel = this.model.Model.ToMutable();
@@ -295,6 +326,7 @@ namespace DiagramDesigner.Controller
           this.Model = mutableModel.ToImmutable();
       }
        */
+    /*
       public void SetParameterToOperation(ImmutableObject operationObject,ImmutableObject parameterObject, ParameterDirectionKind kind)
       {
           var mutableModel = this.model.Model.ToMutable();
@@ -469,33 +501,9 @@ namespace DiagramDesigner.Controller
           }
       }
 
-      */
+      
 
     }
+ */
 
-
-    public class DiagramController
-    {
-
-        private Connector _connector;
-
-        public Connector Connector
-        {
-            get { return this._connector; }
-        }
-
-        public DiagramController(Connector connector)
-        {
-            this._connector = connector;
-        }
-
-        public bool Open()
-        {
-            if (this._connector.Equals(null)) return false;
-
-            this._connector.ConnectUMLModelAndGraphLayout();
-            return true;
-        }
-
-    }
 }

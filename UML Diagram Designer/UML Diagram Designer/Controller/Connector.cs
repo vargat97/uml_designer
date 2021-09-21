@@ -1,10 +1,8 @@
-﻿using DiagramDesigner.Model;
-using MetaDslx.GraphViz;
+﻿using MetaDslx.GraphViz;
 using MetaDslx.Languages.Uml.Model;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using UML_Diagram_Designer.Model;
 
 namespace UML_Diagram_Designer.Controller
 {
@@ -13,9 +11,19 @@ namespace UML_Diagram_Designer.Controller
     /// </summary>
     public class Connector
     {
-        private UMLModel _umlModel;
-        private GraphLayout _graphLayout;
-        private UmlFactory _factory;
+        private readonly UMLModel _umlModel;
+        private readonly GraphLayout _graphLayout;
+        private readonly UmlFactory _factory;
+
+        public UMLModel UMLModel
+        {
+            get { return this._umlModel; }
+        }
+
+        public GraphLayout GraphLayout
+        {
+            get { return this._graphLayout; }
+        }
 
         public Connector(UMLModel model, GraphLayout graphLayout)
         {
@@ -242,9 +250,6 @@ namespace UML_Diagram_Designer.Controller
                 }
             }
         }
-   
-
-
 
     }
 }

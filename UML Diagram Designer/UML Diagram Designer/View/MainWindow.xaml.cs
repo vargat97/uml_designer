@@ -2,39 +2,27 @@
 
 using System.Windows;
 using System.Windows.Controls;
-using DiagramDesigner.Model;
-using DiagramDesigner.View;
+
 using MetaDslx.Modeling;
 
-namespace DiagramDesigner
+namespace UML_Diagram_Designer.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Controller.Controller controller;
-
-        
-
+       
         public MainWindow()
         {
-            this.controller = new Controller.Controller();
-            InitializeComponent();
-            
         }
-        public Controller.Controller GetController()
-        {
-            return this.controller;
-        }
-
         private void NewMenuItem_Click(object sender, RoutedEventArgs e)
         {
             //TODOO
         }
 
         private void OpenMenuItem_Click(object sender, RoutedEventArgs e)
-        {
+        {/*
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.DefaultExt = ".uml";
             Nullable<bool> result = dlg.ShowDialog();
@@ -42,9 +30,11 @@ namespace DiagramDesigner
             {
                 this.DiagramView.GraphLayout = controller.OpenFileClickControl(dlg.FileName);
             }
+            */
         }
         private void SaveMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            /*
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.DefaultExt = ".xmi";
             Nullable<bool> result = dlg.ShowDialog();
@@ -55,10 +45,12 @@ namespace DiagramDesigner
                 controller.SaveFileClickControl(fileName);
 
             }
+            */
         }
 
         private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            /*
             if (controller.GetUMLModel() != null)
             {
                 MessageBoxResult result = MessageBox.Show("There are unsaved changes. Would you like to save it?", "Save changes", MessageBoxButton.YesNo);
@@ -74,11 +66,13 @@ namespace DiagramDesigner
                 }
 
             }
+            */
             Application.Current.Shutdown();
         }
 
         private void DetailsGrid_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            /*
             var diagramView = (DiagramView)e.Source;
             var point = e.GetPosition(diagramView);
             var diagramHost = diagramView.GetVisualHost();
@@ -89,7 +83,7 @@ namespace DiagramDesigner
                 if (!this.DetailsView.DrawLine) e.Handled = true;
             }
             else { e.Handled = true; }
-           
+           */
         }
 
     }
