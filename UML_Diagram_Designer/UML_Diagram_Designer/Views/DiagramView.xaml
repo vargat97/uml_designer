@@ -1,0 +1,288 @@
+﻿<UserControl x:Class="UML_Diagram_Designer.Views.DiagramView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:UML_Diagram_Designer.Views"
+             xmlns:models="clr-namespace:UML_Diagram_Designer.Models"
+             mc:Ignorable="d"  Background="Pink"
+             d:DesignHeight="400" d:DesignWidth="400" MouseWheel="{s:Action ZoomGrid}"
+             MouseMove="{s:Action CreateEdgeMouseMove}">
+
+    <UserControl.Resources>
+        <models:NodeLayoutSelector x:Key="nodeLayoutSelector" />
+        <models:EdgeLayoutSelector x:Key="edgeLayoutSelector" />
+        <models:AttributeVisibilityConverter x:Key="attributeVisibilityConverter" />
+        <models:OperationVisibilityConverter x:Key="opertaionVisibilityConverter" />
+        <models:EnumVisibilityConverter x:Key="enumVisibilityConverter" />
+        <DataTemplate x:Key="ClassNodeTemplate" >
+            <Canvas>
+                <Border Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top}" Background="Aquamarine" Width="100"
+                             Height="100">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                        <Grid MouseLeftButtonDown="{s:Action SelectNode}"  MouseLeftButtonUp="{s:Action MouseUp}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" HorizontalAlignment="Left" Text="{Binding NodeObject.MName}" >
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" >
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding NodeObject.IsAbstract, Mode=OneWay}"
+                                                 Value="True">
+                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <Separator VerticalAlignment="Center" Grid.Row="1"/>
+                            <ItemsControl ItemsSource="{Binding AllAttributes }" Grid.Row="2">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <TextBlock MouseLeftButtonDown="{s:Action TextBlockClick}">
+                                                <TextBlock.Text>
+
+                                                    <MultiBinding Converter="{StaticResource attributeVisibilityConverter}">
+                                                        <Binding Path="Visibility" />
+                                                        <Binding Path="MName" />
+                                                        <Binding Path="MType.MName" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Separator VerticalAlignment="Center" Grid.Row="3" />
+
+                            <ItemsControl ItemsSource="{Binding AllOperations }" Grid.Row="4" VerticalAlignment="Stretch" Background="Aquamarine">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <TextBlock MouseLeftButtonDown="{s:Action SelectOperation}">
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource opertaionVisibilityConverter}">
+                                                        <Binding Path="Visibility"/>
+                                                        <Binding Path="MName" />
+                                                        <Binding Path="OwnedParameter" />
+                                                    </MultiBinding>
+
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </ScrollViewer>
+                </Border>
+            </Canvas>
+        </DataTemplate>
+        <DataTemplate x:Key="InterfaceNodeTemplate">
+            <Canvas>
+                <Border Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top}" Background="DarkOrange" Width="100"
+                             Height="100">
+                    <Grid MouseLeftButtonDown="{s:Action SelectNode}"  MouseLeftButtonUp="{s:Action MouseUp}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="{Binding NodeObject.MName}" />
+                        <Separator VerticalAlignment="Center" Grid.Row="1"/>
+                        <ItemsControl ItemsSource="{Binding AllAttributes }" Grid.Row="2">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <TextBlock>
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource attributeVisibilityConverter}">
+                                                    <Binding Path="Visibility" />
+                                                    <Binding Path="MName" />
+                                                    <Binding Path="MType.MName" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Separator VerticalAlignment="Center" Grid.Row="3"/>
+                        <ItemsControl ItemsSource="{Binding AllOperations }" Grid.Row="4">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <TextBlock>
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource opertaionVisibilityConverter}">
+                                                    <Binding Path="Visibility"/>
+                                                    <Binding Path="MName" />
+                                                    <Binding Path="OwnedParameter" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+            </Canvas>
+        </DataTemplate>
+        <DataTemplate x:Key="EnumNodeTemplate">
+            <Canvas>
+                <Border Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top}" Background="Orange" Width="100"
+                             Height="100">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                        <Grid MouseLeftButtonDown="{s:Action SelectNode}"  MouseLeftButtonUp="{s:Action MouseUp}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" HorizontalAlignment="Left" Text="{Binding NodeObject.MName}" >
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" >
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding NodeObject.IsAbstract, Mode=OneWay}"
+                                                 Value="True">
+                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <Separator VerticalAlignment="Center" Grid.Row="1"/>
+                            <ItemsControl ItemsSource="{Binding EnumKinds }" Grid.Row="2">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource enumVisibilityConverter}">
+                                                        <Binding Path="Visibility" />
+                                                        <Binding Path="MName" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </ScrollViewer>
+
+                </Border>
+            </Canvas>
+        </DataTemplate>
+        <DataTemplate x:Key="InterfaceRealizationEdgeTemplate">
+            <Canvas>
+                <Path Stroke="DarkOrange" StrokeThickness="1.5">
+                    <Path.Data>
+                        <PathGeometry Figures="{Binding TrianglePath.Figures}"/>
+                    </Path.Data>
+                </Path>
+                <Path Stroke="Wheat" StrokeThickness="6" MouseLeftButtonDown="{s:Action SelectEdge}" >
+                    <Path.Data>
+                        <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
+                    </Path.Data>
+                </Path>
+                <Path Stroke="DarkOrange" StrokeThickness="1.5" StrokeDashArray="2, 4" >
+                    <Path.Data>
+                        <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
+                    </Path.Data>
+                </Path>
+            </Canvas>
+        </DataTemplate>
+        <DataTemplate x:Key="GeneralizationEdgeTemplate">
+            <Canvas>
+                <Path Stroke="Black" StrokeThickness="1.5">
+                    <Path.Data>
+                        <PathGeometry Figures="{Binding TrianglePath.Figures}"/>
+                    </Path.Data>
+                </Path>
+                <Path Stroke="Transparent" StrokeThickness="4" MouseLeftButtonDown="{s:Action SelectEdge}" >
+                    <Path.Data>
+                        <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
+                    </Path.Data>
+                </Path>
+                <Path Stroke="Black" StrokeThickness="2" >
+                    <Path.Data>
+                        <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
+                    </Path.Data>
+                </Path>
+            </Canvas>
+        </DataTemplate>
+        <DataTemplate x:Key="AssociationEdgeTemplate">
+            <Canvas>
+                <Path Stroke="Transparent" StrokeThickness="4" MouseLeftButtonDown="{s:Action SelectEdge}" >
+                    <Path.Data>
+                        <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
+                    </Path.Data>
+                </Path>
+                <Path Stroke="Black" StrokeThickness="1" >
+                    <Path.Data>
+                        <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
+                    </Path.Data>
+                </Path>
+            </Canvas>
+        </DataTemplate>
+        <DataTemplate x:Key="DependencyEdgeTemplate" >
+            <Canvas>
+                <Path Stroke="Black" StrokeThickness="1.5">
+                    <Path.Data>
+                        <PathGeometry Figures="{Binding TrianglePath.Figures}"/>
+                    </Path.Data>
+                </Path>
+                <Path Stroke="Transparent" StrokeThickness="4" MouseLeftButtonDown="{s:Action SelectEdge}" >
+                    <Path.Data>
+                        <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
+                    </Path.Data>
+                </Path>
+                <Path Stroke="Black" StrokeThickness="1" StrokeDashArray="10,4" >
+                <Path.Data>
+                    <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
+                </Path.Data>
+                </Path>
+            </Canvas>
+        </DataTemplate>
+
+    </UserControl.Resources>
+
+    <UserControl.LayoutTransform>
+        <ScaleTransform ScaleX="{Binding Scale}" ScaleY="{Binding Scale}" />
+    </UserControl.LayoutTransform>
+
+    
+    <ScrollViewer  VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20"/>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+           <StackPanel Grid.Row="1" Grid.Column="2" SizeChanged="{s:Action CanvasSizeChanged}" Width="{Binding CanvasSize.X}" Height="{Binding CanvasSize.Y}">
+                <ItemsControl ItemsSource="{Binding GraphLayout.AllNodes}" ItemTemplateSelector="{StaticResource nodeLayoutSelector}"/>
+                <ItemsControl ItemsSource="{Binding GraphLayout.AllEdges}" ItemTemplateSelector="{StaticResource edgeLayoutSelector}" />
+                <Line X1="{Binding CreateEdgeLine.X1}" Y1="{Binding CreateEdgeLine.Y1}" X2="{Binding CreateEdgeLine.X2}" Y2="{Binding CreateEdgeLine.Y2}" Stroke="Black" StrokeThickness="3" />
+
+            </StackPanel>
+            <Button Grid.Column="0" Content="-" Width="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="{s:Action ZoomOut}"/>
+            <Button Grid.Column="1" Content="+" Width="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="{s:Action ZoomIn}"/>
+        </Grid>
+    </ScrollViewer>
+    
+</UserControl>
