@@ -17,7 +17,7 @@ namespace UML_Diagram_Designer.ViewModels
     {
 
         private ImmutableObject _relationShipObject;
-
+        private HashSet<ImmutableObject> _modelstypes;
         private IEventAggregator _eventAggregator;
         private NodeLayout _nodeLayout;
         private EdgeLayout _edgeLayout;
@@ -25,6 +25,15 @@ namespace UML_Diagram_Designer.ViewModels
         private ImmutableModel _immutableModel;
         private UmlFactory _factory;
         private Functions _functions;
+
+        public HashSet<ImmutableObject> ModelsTypes
+        {
+            get { return this._modelstypes; }
+            set
+            {
+                SetAndNotify(ref this._modelstypes, value);
+            }
+        }
         public NodeLayout NodeLayout
         {
             get { return this._nodeLayout; }
@@ -64,7 +73,9 @@ namespace UML_Diagram_Designer.ViewModels
             this._eventAggregator = eventAggregator;
             this._immutableModel = immutableModel;
             this._functions = new Functions(_immutableModel);
+            this.FillModelsTypesCollection();
         }
+
 
         public bool IsCreateRealtionShip
         {
@@ -122,6 +133,7 @@ namespace UML_Diagram_Designer.ViewModels
 
         public void ChangeVisibility(ComboBox sender, SelectionChangedEventArgs e)
         {
+            if (e.AddedItems.Count == 0) return;
             var addedItem = e.AddedItems[0];
             var visibilityKind = (VisibilityKind)addedItem;
 
@@ -198,8 +210,11 @@ namespace UML_Diagram_Designer.ViewModels
             RelationShipObject = this._functions.CreateGeneralization();
         }
 
-        public void IsAbstractCheck(object sender, RoutedEventArgs e)
+        public void IsAbstractCheck(CheckBox sender, RoutedEventArgs e)
         {
+            if(NodeLayout == null) return ;
+            var isAbstract = ((Classifier)NodeLayout.NodeObject).IsAbstract;
+            if(isAbstract == sender.IsChecked) return;
             var immutableModel = this._functions.SetObjectToAbstract((ImmutableObject)NodeLayout.NodeObject);
             this._immutableModel = immutableModel;
             this.PublishEvent();
@@ -307,6 +322,18 @@ namespace UML_Diagram_Designer.ViewModels
             return mutableModel.ToImmutable();
         }
 
+        private void FillModelsTypesCollection()
+        {
+            var my_hash = new HashSet<ImmutableObject>();
+            foreach(var model_object in this._immutableModel.Objects)
+            {
+                if(model_object.MType != null)
+                {
+                    my_hash.Add(model_object.MType);
+                }
+            }
+            ModelsTypes = my_hash;
+        }
 
     } 
 }

@@ -210,7 +210,7 @@
                         <PathGeometry Figures="{Binding TrianglePath.Figures}"/>
                     </Path.Data>
                 </Path>
-                <Path Stroke="Transparent" StrokeThickness="4" MouseLeftButtonDown="{s:Action SelectEdge}" >
+                <Path Stroke="Transparent" StrokeThickness="6" MouseLeftButtonDown="{s:Action SelectEdge}" >
                     <Path.Data>
                         <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
                     </Path.Data>

@@ -98,6 +98,7 @@ namespace UML_Diagram_Designer.ViewModels
         }
         public void SelectNode(object sender, MouseButtonEventArgs e)
         {
+            if (e.Handled) return;
             var relativeTo = (FrameworkElement)sender;
             var datacontext = relativeTo.DataContext;
             NodeLayout layout = (NodeLayout)datacontext;
@@ -110,6 +111,7 @@ namespace UML_Diagram_Designer.ViewModels
             }
 
             this._diagramEditorViewModel.EdgeLayout = null;
+            this._diagramEditorViewModel.DetailsObject = null;
             layout.Selected = true;
             object layoutInstance = Convert.ChangeType(layout, datacontext.GetType());
 
@@ -120,7 +122,7 @@ namespace UML_Diagram_Designer.ViewModels
         {
             if (!this._diagramEditorViewModel.IsCreateRealtionShip) return;
 
-            var my_sender = (FrameworkElement)sender;
+            var my_sender = (Grid)sender;
             var datacontext = my_sender.DataContext;
             NodeLayout layout = (NodeLayout)datacontext;
 
@@ -140,14 +142,17 @@ namespace UML_Diagram_Designer.ViewModels
             var relativeTo = (FrameworkElement)sender;
             var p = e.GetPosition(relativeTo);
 
-            CreateEdgeLine.X2 = p.X;
-            CreateEdgeLine.Y2 = p.Y;
+      
+
+            CreateEdgeLine.X2 = p.X  - 100;
+            CreateEdgeLine.Y2 = p.Y - 50;
 
         }
 
         public void SelectEdge(object sender, MouseButtonEventArgs e)
         {
             this._diagramEditorViewModel.NodeLayout = null;
+            this._diagramEditorViewModel.DetailsObject = null;
             var datacontext = (((Path)sender).DataContext);
             var layout = (EdgeLayout)datacontext;
             object layoutInstance = Convert.ChangeType(layout, datacontext.GetType());    
@@ -157,12 +162,14 @@ namespace UML_Diagram_Designer.ViewModels
 
         public void TextBlockClick(object sender, MouseButtonEventArgs e)
         {
+            e.Handled = true;
             this._diagramEditorViewModel.NodeLayout = null;
             var datacontext = (((TextBlock)sender).DataContext);
             this._diagramEditorViewModel.DetailsObject = (Property)datacontext;
         }
         public void SelectOperation(object sender, MouseButtonEventArgs e)
         {
+            e.Handled = true;
             this._diagramEditorViewModel.NodeLayout = null;
             var datacontext = (((TextBlock)sender).DataContext);
             this._diagramEditorViewModel.DetailsObject = (Operation)datacontext;
