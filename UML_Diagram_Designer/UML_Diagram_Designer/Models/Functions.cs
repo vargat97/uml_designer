@@ -146,6 +146,7 @@ namespace UML_Diagram_Designer.Models
             var dependencyBuilder = factory.Dependency();
             return dependencyBuilder.ToImmutable();
         }
+
         public ImmutableModel ModifyObjectVisivility(ImmutableObject obj, VisibilityKind kind)
         {
             if (this._immutableModel.ContainsObject(obj))

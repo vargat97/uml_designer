@@ -4,6 +4,7 @@ using RandomNameGeneratorLibrary;
 using Stylet;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,7 +18,7 @@ namespace UML_Diagram_Designer.ViewModels
     {
 
         private ImmutableObject _relationShipObject;
-        private HashSet<ImmutableObject> _modelstypes;
+        private List<ImmutableObject> _modelstypes;
         private IEventAggregator _eventAggregator;
         private NodeLayout _nodeLayout;
         private EdgeLayout _edgeLayout;
@@ -26,7 +27,7 @@ namespace UML_Diagram_Designer.ViewModels
         private UmlFactory _factory;
         private Functions _functions;
 
-        public HashSet<ImmutableObject> ModelsTypes
+        public List<ImmutableObject> ModelsTypes
         {
             get { return this._modelstypes; }
             set
@@ -96,7 +97,13 @@ namespace UML_Diagram_Designer.ViewModels
             this._eventAggregator.Publish(immutableModelChangedEvnt);
         }
 
+        public void ChangeObjectNameParameter(string parameter)
+        {
+            if(parameter == "enum")
+            {
 
+            }
+        }
         public void ChangeObjectName(TextBox sender, System.EventArgs e)
         {
             var immutableObject = this.DetailsObject;
@@ -117,11 +124,10 @@ namespace UML_Diagram_Designer.ViewModels
         }
 
         //TODO: create a uniform remove function. Questions: what to do with the parameters of the operations and etc..
-        public void RemoveObjectFromModel()
+        public void RemoveFromModel()
         {
 
         }
-
 
 
 
@@ -136,8 +142,13 @@ namespace UML_Diagram_Designer.ViewModels
             if (e.AddedItems.Count == 0) return;
             var addedItem = e.AddedItems[0];
             var visibilityKind = (VisibilityKind)addedItem;
+            ImmutableObject immutableObject = null;
+            if (NodeLayout != null) immutableObject = (ImmutableObject)NodeLayout.NodeObject;
+            else if (EdgeLayout != null) immutableObject = (ImmutableObject)EdgeLayout.EdgeObject;
+            else if  (DetailsObject != null) immutableObject = DetailsObject;
 
-            var immutableObject = (ImmutableObject)(sender.DataContext);
+            if (immutableObject == null) return;
+
             var immutableModel = this._functions.ModifyObjectVisivility(immutableObject, visibilityKind);
 
             this._immutableModel = immutableModel;
@@ -332,7 +343,7 @@ namespace UML_Diagram_Designer.ViewModels
                     my_hash.Add(model_object.MType);
                 }
             }
-            ModelsTypes = my_hash;
+            ModelsTypes = my_hash.ToList();
         }
 
     } 

@@ -39,7 +39,7 @@
                 <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding NodeObject.MName, Mode=OneWay}" VerticalAlignment="Top" LostFocus="{s:Action ChangeName}" />
                 <TextBlock Grid.Row="3" Grid.Column="1" Text="Visibility" />
                 <!--<ComboBox ItemsSource="{Binding DataContext.Visibilities,RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"  SelectedValue="{Binding NodeObject.Visibility, Mode=OneWay}" SelectedValuePath="Visibility"  Grid.Row="2" Grid.Column="2" VerticalAlignment="Top"/>-->
-                <ComboBox ItemsSource="{Binding Source={models:EnumBindingSource {x:Type umlmodel:VisibilityKind}}}" SelectedValue="{Binding NodeObject.Visibility,Mode=OneWay}" Grid.Row="3" Grid.Column="2" VerticalAlignment="Top"/>
+                <ComboBox ItemsSource="{Binding Source={models:EnumBindingSource {x:Type umlmodel:VisibilityKind}}}" SelectionChanged="{s:Action ChangeVisibility}" SelectedValue="{Binding NodeObject.Visibility,Mode=OneWay}"   Grid.Row="3" Grid.Column="2" VerticalAlignment="Top"/>
                 <TextBlock Grid.Row="4" Grid.Column="1" Text="isAbstract" />
                 
                 <CheckBox Grid.Row="4" Grid.Column="2" VerticalAlignment="Top"  IsChecked="{Binding NodeObject.IsAbstract, Mode=OneWay}" Unchecked="{s:Action IsAbstractCheck}" Checked="{s:Action IsAbstractCheck}"/>
@@ -106,6 +106,8 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+
                 </Grid.RowDefinitions>
                 <Button  Grid.Row="1" Grid.Column="2" VerticalAlignment="Top" Click="{s:Action RemoveObjectFromModel}">Remove from model</Button>
                 <TextBlock Grid.Row="2" Grid.Column="1" Text="Name" />
@@ -116,8 +118,11 @@
                 <TextBlock Grid.Row="4" Grid.Column="1" Text="isAbstract" />
                 <CheckBox Grid.Row="4" Grid.Column="2" VerticalAlignment="Top"  IsChecked="{Binding NodeObject.IsAbstract, Mode=OneWay}" Unchecked="{s:Action IsAbstractCheck}" Checked="{s:Action IsAbstractCheck}"/>
                 <TextBlock Grid.Row="5" Grid.Column="1" Text="Literals" />
-                <ComboBox ItemsSource="{Binding EnumKinds}" DisplayMemberPath="MName" IsSynchronizedWithCurrentItem="True" SelectedItem="0" Grid.Row="5" Grid.Column="2" VerticalAlignment="Top" />
+                <ComboBox Name="EnumList" ItemsSource="{Binding EnumKinds}" DisplayMemberPath="MName" IsSynchronizedWithCurrentItem="True" SelectedItem="0" Grid.Row="5" Grid.Column="2" VerticalAlignment="Top" />
                 <Button Click="{s:Action CreateEnumLiteral}" Grid.Row="5" Grid.Column="3" VerticalAlignment="Top" >...</Button>
+                <TextBlock Grid.Row="6" Grid.Column="1" Text="Literal" />
+                <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding ElementName=EnumList, Path=SelectedItem.MName, Mode=OneWay}" VerticalAlignment="Top"/>
+                <Button Grid.Row="6" Grid.Column="3" VerticalAlignment="Top" Command="{s:Action ChangeObjectNameParameter}" CommandParameter="enum">...</Button>
             </Grid>
 
         </DataTemplate>
@@ -142,10 +147,10 @@
                 <TextBlock Grid.Row="2" Grid.Column="1" Text="Visibility" />
                 <ComboBox ItemsSource="{Binding Source={models:EnumBindingSource {x:Type umlmodel:VisibilityKind}}}" SelectedValue="{Binding EdgeObject.Visibility,Mode=OneWay}" Grid.Row="2" Grid.Column="2" VerticalAlignment="Top"/>
                 <TextBlock Grid.Row="3" Grid.Column="1" Text="Client" />
-                <ComboBox ItemsSource="{Binding EdgeObject.Client}" IsSynchronizedWithCurrentItem="True" DisplayMemberPath="MName" SelectedIndex="0" Grid.Row="3" Grid.Column="2"  VerticalAlignment="Top"/>
+                <ComboBox Grid.Row="3" Grid.Column="2" ItemsSource="{Binding Path=DataContext.ModelsTypes, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" DisplayMemberPath="MName" SelectedValue="{Binding Source.NodeObject, Mode=OneWay}" VerticalAlignment="Top"/>
 
                 <TextBlock Grid.Row="4" Grid.Column="1" Text="Supplier" />
-                <ComboBox ItemsSource="{Binding EdgeObject.Supplier}" DisplayMemberPath="MName" SelectedIndex="0" Grid.Row="4" Grid.Column="2"  VerticalAlignment="Top"/>
+                <ComboBox Grid.Row="4" Grid.Column="2" ItemsSource="{Binding Path=DataContext.ModelsTypes, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" DisplayMemberPath="MName" SelectedValue="{Binding Target.NodeObject, Mode=OneWay}" VerticalAlignment="Top"/>
 
             </Grid>
         </DataTemplate>
@@ -167,77 +172,13 @@
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="1" Grid.Column="1" Text="Name" />
                 <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding EdgeObject}" VerticalAlignment="Top" />
-                <TextBlock Grid.Row="3" Grid.Column="1" Text="Parent" />
-                <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding Target.NodeObject.MName, Mode=OneWay}" VerticalAlignment="Top"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="Parent" />
+                <ComboBox Grid.Row="2" Grid.Column="2" ItemsSource="{Binding Path=DataContext.ModelsTypes, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" DisplayMemberPath="MName" SelectedValue="{Binding Target.NodeObject, Mode=OneWay}" VerticalAlignment="Top"/>
 
 
-                <TextBlock Grid.Row="4" Grid.Column="1" Text="Child" />
-                <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding Source.NodeObject.MName, Mode=OneWay}" VerticalAlignment="Top"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="Child" />
+                <ComboBox Grid.Row="3" Grid.Column="2" ItemsSource="{Binding Path=DataContext.ModelsTypes, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" DisplayMemberPath="MName" SelectedValue="{Binding Source.NodeObject, Mode=OneWay}" VerticalAlignment="Top"/>
 
-            </Grid>
-        </DataTemplate>
-        <DataTemplate x:Key="PropertyImplTemplate" >
-            <Grid Background="AntiqueWhite">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="7*" />
-                    <ColumnDefinition Width="7*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Button  Grid.Row="0" Grid.Column="2" VerticalAlignment="Top" Click="{s:Action RemoveProperty}">Remove from model</Button>
-
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="Name" />
-                <TextBox LostFocus="{s:Action ChangeObjectName}" Grid.Row="1" Grid.Column="2" Text="{Binding MName, Mode=OneTime}" VerticalAlignment="Top" />
-
-                <TextBlock Grid.Row="2" Grid.Column="1" Text="Visibility" />
-                <ComboBox ItemsSource="{Binding Source={models:EnumBindingSource {x:Type umlmodel:VisibilityKind}}}"  SelectionChanged="{s:Action ChangeVisibility}" SelectedValue="{Binding Visibility,Mode=OneWay}" Grid.Row="2" Grid.Column="2" VerticalAlignment="Top"/>
-                <TextBlock Grid.Row="3" Grid.Column="1" Text="Type" />
-                <TextBox Text="{Binding MType.MName, Mode=OneWay}"  Grid.Row="3" Grid.Column="2"  VerticalAlignment="Top"/> 
-
-            </Grid>
-        </DataTemplate>
-        <DataTemplate x:Key="OperationImplTemplate">
-            <Grid Background="AntiqueWhite">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="7*" />
-                    <ColumnDefinition Width="7*" />
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Button  Grid.Row="0" Grid.Column="2" VerticalAlignment="Top" Click="{s:Action RemoveOperation}">Remove from model</Button>
-
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="Name" />
-                <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding MName, Mode=OneWay}" VerticalAlignment="Top" LostFocus="{s:Action ChangeObjectName}"/>
-
-                <TextBlock Grid.Row="2" Grid.Column="1" Text="Visibility" />
-                <ComboBox ItemsSource="{Binding Source={models:EnumBindingSource {x:Type umlmodel:VisibilityKind}}}" SelectionChanged="{s:Action ChangeVisibility}" SelectedValue="{Binding Visibility,Mode=OneWay}" Grid.Row="2" Grid.Column="2" VerticalAlignment="Top"/>
-                <TextBlock Grid.Row="3" Grid.Column="1" Text="Type" />
-                <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding Type.MName, Mode=OneWay}"  VerticalAlignment="Top"/>
-                <TextBlock Grid.Row="4" Grid.Column="1" Text="Parameters:" />
-                <ComboBox Name="ParameterList" ItemsSource="{Binding MChildren}" IsSynchronizedWithCurrentItem="True" DisplayMemberPath="MName" SelectedIndex="0" Grid.Row="4" Grid.Column="2"  VerticalAlignment="Top"/>
-                <Button Grid.Column="3" Grid.Row="4" VerticalAlignment="Top" Click="{s:Action AddParameterToOperation}">...</Button>
-                <TextBlock Grid.Row="5" Grid.Column="1" Text="Parameter name" />
-                <TextBox Grid.Row="5" Grid.Column="2" Text="{Binding ElementName=ParameterList, Path=SelectedItem.MName, Mode=OneWay}" VerticalAlignment="Top" LostFocus="{s:Action ChangeOperationsName}" />
-                <TextBlock Grid.Row="6" Grid.Column="1" Text="Parameter type" />
-                <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding ElementName=ParameterList, Path=SelectedItem.Type.MName, Mode=OneWay}" VerticalAlignment="Top" />
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="DependencyEdgeTemplate" >
@@ -261,10 +202,10 @@
                 <TextBlock Grid.Row="2" Grid.Column="1" Text="Visibility" />
                 <ComboBox ItemsSource="{Binding Source={models:EnumBindingSource {x:Type umlmodel:VisibilityKind}}}" SelectedValue="{Binding EdgeObject.Visibility,Mode=OneWay}" Grid.Row="2" Grid.Column="2" VerticalAlignment="Top"/>
                 <TextBlock Grid.Row="3" Grid.Column="1" Text="Client" />
-                <ComboBox ItemsSource="{Binding EdgeObject.Client}" IsSynchronizedWithCurrentItem="True" DisplayMemberPath="MName" SelectedIndex="0" Grid.Row="3" Grid.Column="2"  VerticalAlignment="Top"/>
+                <ComboBox Grid.Row="3" Grid.Column="2" ItemsSource="{Binding Path=DataContext.ModelsTypes, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" DisplayMemberPath="MName" SelectedValue="{Binding Source.NodeObject, Mode=OneWay}" VerticalAlignment="Top"/>
 
                 <TextBlock Grid.Row="4" Grid.Column="1" Text="Supplier" />
-                <ComboBox ItemsSource="{Binding EdgeObject.Supplier}" DisplayMemberPath="MName" SelectedIndex="0" Grid.Row="4" Grid.Column="2"  VerticalAlignment="Top"/>
+                <ComboBox Grid.Row="4" Grid.Column="2" ItemsSource="{Binding Path=DataContext.ModelsTypes, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" DisplayMemberPath="MName" SelectedValue="{Binding Target.NodeObject, Mode=OneWay}" VerticalAlignment="Top"/>
 
             </Grid>
         </DataTemplate>
@@ -324,7 +265,72 @@
                 <TextBlock />
             </Grid>
         </DataTemplate>
-    
+
+        <DataTemplate x:Key="PropertyImplTemplate" >
+            <Grid Background="AntiqueWhite">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="7*" />
+                    <ColumnDefinition Width="7*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Button  Grid.Row="0" Grid.Column="2" VerticalAlignment="Top" Click="{s:Action RemoveProperty}">Remove from model</Button>
+
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="Name" />
+                <TextBox LostFocus="{s:Action ChangeObjectName}" Grid.Row="1" Grid.Column="2" Text="{Binding MName, Mode=OneTime}" VerticalAlignment="Top" />
+
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="Visibility" />
+                <ComboBox ItemsSource="{Binding Source={models:EnumBindingSource {x:Type umlmodel:VisibilityKind}}}"  SelectionChanged="{s:Action ChangeVisibility}" SelectedValue="{Binding Visibility,Mode=OneWay}" Grid.Row="2" Grid.Column="2" VerticalAlignment="Top"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="Type" />
+                <!--<TextBox Text="{Binding MType.MName, Mode=OneWay}"  Grid.Row="3" Grid.Column="2"  VerticalAlignment="Top"/>  -->
+                <ComboBox Grid.Row="3" Grid.Column="2" ItemsSource="{Binding Path=DataContext.ModelsTypes, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" DisplayMemberPath="MName" SelectedValue="{Binding MType, Mode=OneWay}" VerticalAlignment="Top"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="OperationImplTemplate">
+            <Grid Background="AntiqueWhite">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="7*" />
+                    <ColumnDefinition Width="7*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Button  Grid.Row="0" Grid.Column="2" VerticalAlignment="Top" Click="{s:Action RemoveOperation}">Remove from model</Button>
+
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="Name" />
+                <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding MName, Mode=OneWay}" VerticalAlignment="Top" LostFocus="{s:Action ChangeObjectName}"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="Visibility" />
+                <ComboBox ItemsSource="{Binding Source={models:EnumBindingSource {x:Type umlmodel:VisibilityKind}}}" SelectionChanged="{s:Action ChangeVisibility}" SelectedValue="{Binding Visibility,Mode=OneWay}" Grid.Row="2" Grid.Column="2" VerticalAlignment="Top"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="Type" />
+                <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding Type.MName, Mode=OneWay}"  VerticalAlignment="Top"/>
+                <TextBlock Grid.Row="4" Grid.Column="1" Text="Parameters:" />
+                <ComboBox Name="ParameterList" ItemsSource="{Binding MChildren}" IsSynchronizedWithCurrentItem="True" DisplayMemberPath="MName" SelectedIndex="0" Grid.Row="4" Grid.Column="2"  VerticalAlignment="Top"/>
+                <Button Grid.Column="3" Grid.Row="4" VerticalAlignment="Top" Click="{s:Action AddParameterToOperation}">...</Button>
+                <TextBlock Grid.Row="5" Grid.Column="1" Text="Parameter name" />
+                <TextBox Grid.Row="5" Grid.Column="2" Text="{Binding ElementName=ParameterList, Path=SelectedItem.MName, Mode=OneWay}" VerticalAlignment="Top"/>
+                <TextBlock Grid.Row="6" Grid.Column="1" Text="Parameter type" />
+                <ComboBox Grid.Row="6" Grid.Column="2" ItemsSource="{Binding Path=DataContext.ModelsTypes, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}}" DisplayMemberPath="MName" SelectedValue="{Binding ElementName=ParameterList, Path=SelectedItem.MType, Mode=OneWay}" VerticalAlignment="Top"/>
+            </Grid>
+        </DataTemplate>
+
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>

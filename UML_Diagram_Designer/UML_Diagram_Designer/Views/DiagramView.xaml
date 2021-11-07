@@ -186,17 +186,17 @@
         </DataTemplate>
         <DataTemplate x:Key="InterfaceRealizationEdgeTemplate">
             <Canvas>
-                <Path Stroke="DarkOrange" StrokeThickness="1.5">
+                <Path Stroke="Black" StrokeThickness="1.5">
                     <Path.Data>
                         <PathGeometry Figures="{Binding TrianglePath.Figures}"/>
                     </Path.Data>
                 </Path>
-                <Path Stroke="Wheat" StrokeThickness="6" MouseLeftButtonDown="{s:Action SelectEdge}" >
+                <Path Stroke="Transparent" StrokeThickness="6" MouseLeftButtonDown="{s:Action SelectEdge}" >
                     <Path.Data>
                         <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
                     </Path.Data>
                 </Path>
-                <Path Stroke="DarkOrange" StrokeThickness="1.5" StrokeDashArray="2, 4" >
+                <Path Stroke="Black" StrokeThickness="1.5" StrokeDashArray="2, 4" >
                     <Path.Data>
                         <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
                     </Path.Data>
