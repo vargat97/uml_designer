@@ -129,6 +129,13 @@ namespace UML_Diagram_Designer.ViewModels
 
         }
 
+        public void TextBoxKeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+            {
+                this.ChangeName((TextBox)sender, e);
+            }
+        }
 
 
 
@@ -148,7 +155,7 @@ namespace UML_Diagram_Designer.ViewModels
             else if  (DetailsObject != null) immutableObject = DetailsObject;
 
             if (immutableObject == null) return;
-
+            this._functions = new Functions(this._immutableModel);
             var immutableModel = this._functions.ModifyObjectVisivility(immutableObject, visibilityKind);
 
             this._immutableModel = immutableModel;

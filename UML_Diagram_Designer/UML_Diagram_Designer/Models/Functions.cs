@@ -1,5 +1,6 @@
 ﻿using MetaDslx.Languages.Uml.Model;
 using MetaDslx.Modeling;
+using Stylet;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,10 +9,14 @@ namespace UML_Diagram_Designer.Models
 {
     public class Functions
     {
-        private ImmutableModel _immutableModel;
-        public Functions(ImmutableModel immutableModel)
+
+    
+
+    private ImmutableModel _immutableModel;
+        public Functions(ImmutableModel immutableModel )
         {
             this._immutableModel = immutableModel;
+
         }
         public ImmutableModel CreateRelationship(ImmutableObject source, ImmutableObject dest, ImmutableObject relationship)
         {
