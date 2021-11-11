@@ -96,13 +96,14 @@ namespace UML_Diagram_Designer.ViewModels
             var immutableModelChangedEvnt = new ImmutableModelChangedEvent(this._immutableModel);
             this._eventAggregator.Publish(immutableModelChangedEvnt);
         }
-
-        public void ChangeObjectNameParameter(string parameter)
+        /// <summary>
+        /// Changes the enum literals name
+        /// </summary>
+        /// <param name="parameter">Enum literal's neew name</param>
+        /// <returns>No return value</returns>
+        public void ChangeEnumLiteralName(string parameter)
         {
-            if(parameter == "enum")
-            {
-
-            }
+            //TODO
         }
         public void ChangeObjectName(TextBox sender, System.EventArgs e)
         {
@@ -111,39 +112,63 @@ namespace UML_Diagram_Designer.ViewModels
             this._immutableModel = immutableModel;
             this.PublishEvent();
         }
-        // TODO :Nodelayout, EdgeLayout refactor to detailsobject, and remove that function
-        public void ChangeName(TextBox sender, System.EventArgs e)
-        {
-
-            var layout = (NodeLayout)(sender.DataContext);
-
-            var immutableObject = (ImmutableObject)(layout.NodeObject);
+        /// <summary>
+        /// Change The name of the Nodelayout's object
+        /// </summary>
+        /// <param name="sender">Textbox, contains the new name of the object</param>
+        /// <param name="e">EventArgs</param>
+        /// <returns>No returns value</returns>
+        public void ChangeName(TextBox sender,EventArgs e)
+        { 
+            var immutableObject = (ImmutableObject)(NodeLayout.NodeObject);
             var immutableModel = this._functions.ModifyObjectName(immutableObject, sender.Text);
             this._immutableModel = immutableModel;
             this.PublishEvent();
         }
-
-        //TODO: create a uniform remove function. Questions: what to do with the parameters of the operations and etc..
-        public void RemoveFromModel()
+        /// <summary>
+        /// Remove the ImmutableObject of the selected ClassifierLayout from the model
+        /// Removes all the selected object relevant objects too
+        /// Than Publish an event to notify the subscribers to refresh their states
+        /// </summary>
+        /// <param>No parameter value</param>
+        /// <returns>No return value</returns>
+        public void RemoveClassFromModel()
         {
-
+            var immutableObject = (ImmutableObject)this.NodeLayout.NodeObject;
+            var immutableModel = this._functions.RemoveClassObjectFromModel((Class)immutableObject);
+            this._immutableModel = immutableModel;
+            NodeLayout = null;
+            this.PublishEvent();
+        }
+        /// <summary>
+        /// Removes the selected interfacerealization from the Model
+        /// Removes the realized interface's attributes and operations
+        /// </summary>
+        /// <param name="sender">Neccesary parameter for the click action</param>
+        /// <param name="e">Neccesary parameter for the click action</param>
+        /// <returns>No return value</returns>
+        public void RemoveInterfaceRealizationFromModel(object sender, RoutedEventArgs e)
+        {
+            var interfaceRealization = (InterfaceRealization)EdgeLayout.EdgeObject;
+            var immutableModel = this._functions.RemveInterfaceRealizationFromModel(interfaceRealization);
+            this._immutableModel = immutableModel;
+            EdgeLayout = null;
+            this.PublishEvent();
         }
 
-        public void TextBoxKeyDown(object sender, KeyEventArgs e)
+        public void RemoveGeneralizationFromModel(object sender, RoutedEventArgs e)
         {
-            if(e.Key == Key.Enter)
-            {
-                this.ChangeName((TextBox)sender, e);
-            }
+            var generalization = (Generalization)EdgeLayout.EdgeObject;
+            var immutableModel = this._functions.RemoveGeneralizationFromModel(generalization);
+            this._immutableModel = immutableModel;
+            this.PublishEvent();
         }
 
-
-
-
-
-
-
-
+        /// <summary>
+        /// Changes the visibility of the immutableObject</summary>
+        /// <param name="sender"></param>
+        /// <param name="e">SelectionChangedEventArgs</param>
+        /// <returns>No return value</returns>
         public void ChangeVisibility(ComboBox sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 0) return;
@@ -152,7 +177,7 @@ namespace UML_Diagram_Designer.ViewModels
             ImmutableObject immutableObject = null;
             if (NodeLayout != null) immutableObject = (ImmutableObject)NodeLayout.NodeObject;
             else if (EdgeLayout != null) immutableObject = (ImmutableObject)EdgeLayout.EdgeObject;
-            else if  (DetailsObject != null) immutableObject = DetailsObject;
+            else if (DetailsObject != null) immutableObject = DetailsObject;
 
             if (immutableObject == null) return;
             this._functions = new Functions(this._immutableModel);
@@ -161,6 +186,56 @@ namespace UML_Diagram_Designer.ViewModels
             this._immutableModel = immutableModel;
             this.PublishEvent();
         }
+        /// <summary>
+        /// Checks if the keydown button was an Enter, and if yes, call ChangeName function </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">KeyEventArgs</param>
+        /// <returns>No return value</returns>
+        public void TextBoxKeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+            {
+                this.ChangeName((TextBox)sender,e);
+            }
+        }
+        /// <summary>
+        /// Removes the iterface object, its childs and all relevant interfacerealizations from the model
+        /// </summary>
+        /// <param name="interface">Interface, what we would like to remove</param>
+        /// <returns>No return value</returns>
+        public void RemoveInterfaceFromModel()
+        {
+            //TODO
+            var immutableObject = (ImmutableObject)this.NodeLayout.NodeObject;
+           
+            var immutableModel = this._functions.RemoveInterfaceFromModel((Interface)immutableObject);
+            this._immutableModel = immutableModel;
+            EdgeLayout = null;
+            this.PublishEvent();
+        }
+        /// <summary>
+        /// Removes the enum object and its childs from the model
+        /// </summary>
+        public void RemoveEnumFromTheModel()
+        {
+            //TODO
+        }
+        /// <summary>
+        /// If the nodelayout's nodeobject is not abstract, than set it as abstarct
+        /// </summary>
+        /// <param name="sender">Combobox</param>
+        /// <param name="e">RoutedEventArgs</param>
+        /// <returns>No return value</returns>
+        public void IsAbstractCheck(CheckBox sender, RoutedEventArgs e)
+        {
+            if (NodeLayout == null) return;
+            var isAbstract = ((Classifier)NodeLayout.NodeObject).IsAbstract;
+            if (isAbstract == sender.IsChecked) return;
+            var immutableModel = this._functions.SetObjectToAbstract((ImmutableObject)NodeLayout.NodeObject);
+            this._immutableModel = immutableModel;
+            this.PublishEvent();
+        }
+
 
         public void AddParameterToOperation(Button sender,RoutedEventArgs e)
         {
@@ -228,15 +303,6 @@ namespace UML_Diagram_Designer.ViewModels
             RelationShipObject = this._functions.CreateGeneralization();
         }
 
-        public void IsAbstractCheck(CheckBox sender, RoutedEventArgs e)
-        {
-            if(NodeLayout == null) return ;
-            var isAbstract = ((Classifier)NodeLayout.NodeObject).IsAbstract;
-            if(isAbstract == sender.IsChecked) return;
-            var immutableModel = this._functions.SetObjectToAbstract((ImmutableObject)NodeLayout.NodeObject);
-            this._immutableModel = immutableModel;
-            this.PublishEvent();
-        }
         public void AddAttributeToClassifier(object sender, RoutedEventArgs e)
         {
             var immutableModel = this.CreateProperty();

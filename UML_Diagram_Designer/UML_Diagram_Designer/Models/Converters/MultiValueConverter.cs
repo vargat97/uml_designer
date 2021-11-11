@@ -77,9 +77,12 @@ namespace UML_Diagram_Designer.Models
                     return_type = op_params[i].MType.MName;
                     break;
                 }
-                sb_parameters.Append(op_params[i].MName);
-                sb_parameters.Append(": ");
-                sb_parameters.Append(op_params[i].MType.MName);
+                if (op_params[i].MType != null)
+                {
+                    sb_parameters.Append(op_params[i].MName);
+                    sb_parameters.Append(": ");
+                    sb_parameters.Append(op_params[i].MType.MName);
+                }
                 if (op_params.Count > 1 && i < op_params.Count - 1)
                     sb_parameters.Append(",");
 

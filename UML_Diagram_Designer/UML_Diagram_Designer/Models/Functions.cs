@@ -60,27 +60,235 @@ namespace UML_Diagram_Designer.Models
         }
         public ImmutableModel RemoveOperationObject(Operation immutableObject)
         {
-            foreach(Parameter par in immutableObject.MChildren)
+            this.RemoveOperationObjectAndItsChildren(immutableObject);
+            return this._immutableModel;
+        }
+        /// <summary>
+        /// Removes the given Class object, and its all children from the model</summary>
+        /// <param name="classObject">Class object, what we would like to remove from the model</param>
+        /// <returns>Return a Model, which does not contain the given object</returns>
+        public ImmutableModel RemoveClassObjectFromModel(Class classObject)
+        {
+            
+            foreach(var child in classObject.MChildren)
+            {
+                this.RemoveClassifierChilds(child);
+            }
+            this.RemoveGeneralizationDependsOnClass(classObject);
+            this.RemoveDependencyDependsOnClassifier(classObject);
+            this.RemoveInterfaceRealizationDependsOnClass(classObject);
+           this.RemoveObject(classObject);
+            return this._immutableModel;
+        }
+
+        public ImmutableModel RemoveInterfaceFromModel(Interface interfaceObject)
+        {
+            foreach (var child in interfaceObject.MChildren)
+            {
+                this.RemoveClassifierChilds(child);
+            }
+            this.RemoveInterfaceRealizationDependsOnInterface(interfaceObject);
+            this.RemoveDependencyDependsOnClassifier(interfaceObject);
+            this.RemoveAssociationEndParamaterDependsOnClassifier(interfaceObject);
+            this.RemoveObject(interfaceObject);
+            return this._immutableModel;
+        }
+
+
+        private void RemoveClassifierChilds(ImmutableObject child)
+        {
+            if(child.MMetaClass.MName == "Operation")
+            {
+                this.RemoveOperationObjectAndItsChildren((Operation)child);
+            }
+            else if(child.MMetaClass.MName == "Property")
+            {
+                this.RemovePropertyFromClass((Property)child);
+            }
+        }
+        /// <summary>
+        /// Removes all the parameters of the operations
+        /// Removes the operation from the model
+        /// </summary>
+        /// <param name="operation">The operation what we would like to remove</param>
+        /// <returns>No return value</returns>
+        private void RemoveOperationObjectAndItsChildren(Operation operation)
+        {
+            foreach (Parameter par in operation.MChildren)
             {
                 this.RemoveObject(par);
             }
 
-            this.RemoveObject(immutableObject);
-            return this._immutableModel;
+            this.RemoveObject(operation);
         }
+        
+        /// <summary>
+        /// Removes the property from the model
+        /// If property is member of an association, then search the second end of the association, removes it also, and removes the association too
+        /// </summary>
+        /// <param name="property">Property, what we would like to remove</param>
+        /// <returns>No return value</returns>
+        private void RemovePropertyFromClass(Property property)
+        {
+            var association = property.Association;
+            if (association == null)
+            {
+                this.RemoveObject(property);
+                return;
+            }
 
+            var members = association.Member;
+            foreach(var member in members)
+            {
+                this.RemoveObject(member);
+            }
+            this.RemoveObject(association);
+        }
+        /// <summary>
+        /// Removes all the generalization depends on the parameter classObject
+        /// </summary>
+        /// <param name="classObject">The generalizaton GENERAL side</param>
+        private void RemoveGeneralizationDependsOnClass(ImmutableObject classObject)
+        {
+            foreach(var modelObject in this._immutableModel.Objects)
+            {
+                if(modelObject.MMetaClass.Name == "Generalization")
+                {
+                    var generalization = (GeneralizationBuilder)modelObject.ToMutable();
+                    if(generalization.General.MName == classObject.MName || generalization.Specific.MName == classObject.MName)
+                    {
+                        generalization.SetGeneralLazy(cb => null);
+                        this.RemoveObject(generalization.ToImmutable());
+                    }
+                }
+            }
+        }
+        private void RemoveInterfaceRealizationDependsOnClass(Class classObject)
+        {
+            if(classObject.InterfaceRealization != null)
+            {
+                foreach(var interfaceRealization in classObject.InterfaceRealization)
+                {
+                    var ifrbuilder = interfaceRealization.ToMutable();
+                    ifrbuilder.SetOwnerLazy(eb => null);
+                    ifrbuilder.SetImplementingClassifierLazy(bcb => null);
+                    this.RemoveObject(interfaceRealization);
+                }
+            }
+        }
+        private void RemoveAssociationEndParamaterDependsOnClassifier(Classifier classifierObject)
+        {
+            foreach (var modelObject in this._immutableModel.Objects)
+            {
+                if (modelObject.MMetaClass.Name == "Association")
+                {
+                    var association = (AssociationBuilder)modelObject.ToMutable();
+                    var isRemovable = false;
+                    foreach(var member in association.Member)
+                    {
+                        if (member.MType.MName == classifierObject.MName) isRemovable = true;
+                    }
+
+                    if (isRemovable)
+                    {
+                        foreach (var member in association.Member) this.RemoveObject(member.ToImmutable());
+                        this.RemoveObject(association.ToImmutable());
+                    }
+                }
+            }
+        }
+        private void RemoveInterfaceRealizationDependsOnInterface(Interface interfaceObject)
+        {
+            foreach (var modelObject in this._immutableModel.Objects)
+            {
+                if (modelObject.MMetaClass.Name == "InterfaceRealization")
+                {
+                    var interfacegb = (InterfaceRealizationBuilder)modelObject.ToMutable();
+                    bool isRemovable = false;
+                    foreach(var supplier in interfacegb.Supplier)
+                    {
+                        if(supplier.MName == interfaceObject.MName)
+                        {
+
+                            isRemovable = true;
+                        }
+                    }
+
+                    if (isRemovable)
+                    {
+                        interfacegb.SetOwnerLazy(eb => null);
+                        interfacegb.SetImplementingClassifierLazy(bcb => null);
+                        this.RemoveObject(interfacegb.ToImmutable());
+                    }
+                }
+            }
+        }
+        private void RemoveDependencyDependsOnClassifier(ImmutableObject classObject)
+        {
+            foreach (var modelObject in this._immutableModel.Objects)
+            {
+                if (modelObject.MMetaClass.Name == "Dependency")
+                {
+                    var dependency = (DependencyBuilder)modelObject.ToMutable();
+                    bool isRemovable = false;
+                    foreach(var client in dependency.Client)
+                    {
+                        if (client.MName == classObject.MName)
+                            isRemovable = true;                                             
+                    }
+                    foreach(var supplier in dependency.Supplier)
+                    {
+                        if (supplier.MName == classObject.MName)
+                            isRemovable = true;
+                    }
+
+                    if (isRemovable)
+                    {
+                        dependency.SetOwnerLazy(eb => null);
+                        this.RemoveObject(dependency.ToImmutable());
+                    }
+                       
+                }
+            }
+        }
+        /// <summary>
+        /// Removes the immutableObject from the Model
+        /// </summary>
+        /// <param name="immutableObject">Object, what we would like to remove from the model</param>
+        /// <returns>No return value</returns>
         private void RemoveObject(ImmutableObject immutableObject)
         {
+         
             var mutableModel = this._immutableModel.ToMutable();
 
+            //If Model does not contain the object, then return
             if (mutableModel.GetObject(immutableObject) == null) return;
 
+            //If Model can remove the object from it side, then set the new model as _immutableModel, which no doesnt contains the object
             if (mutableModel.RemoveObject(immutableObject.ToMutable()) ){
                 this._immutableModel = mutableModel.ToImmutable();
                 
             }
         }
-
+        /// <summary>
+        /// Removes the interfacerealization from the model. Removes the connection from the two side of the realiztion, then remove itself
+        /// Removes also the realized interface's attributes and operations from the owner's classifier
+        /// </summary>
+        /// <param name="immutableObject">Interfacerealization, what we would like to remove</param>
+        /// <returns></returns>
+        public ImmutableModel RemveInterfaceRealizationFromModel(InterfaceRealization immutableObject)
+        {
+            var mutableObejct = immutableObject.ToMutable();
+            mutableObejct.SetOwnerLazy(eb => null);
+            mutableObejct.SetContractLazy(ib => null);
+            this.RemoveObject(mutableObejct.ToImmutable());
+            return this._immutableModel;
+        }
+        public ImmutableModel RemoveGeneralizationFromModel(ImmutableObject immutableObject)
+        {
+            this.RemoveObject(immutableObject);
+            return this._immutableModel;
+        }
         public ImmutableModel ModifyObjectName(ImmutableObject obj, string newName)
         {
             if (this._immutableModel.ContainsObject(obj))
