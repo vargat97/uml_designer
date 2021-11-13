@@ -26,7 +26,7 @@ namespace UML_Diagram_Designer.ViewModels
         {
             if (_isDirty)
             {
-                this.SaveDialogOpen();
+                this.SaveDialogOpen(true);
             }
 
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -51,7 +51,7 @@ namespace UML_Diagram_Designer.ViewModels
         {
             if (_isDirty)
             {
-                this.SaveDialogOpen();
+                this.SaveDialogOpen(true);
             }
 
 
@@ -71,9 +71,10 @@ namespace UML_Diagram_Designer.ViewModels
         }
         public void SaveModel()
         {
-            this.SaveDialogOpen();
+            if (!_isDirty) return;
+            this.SaveDialogOpen(false);
         }
-        private void SaveDialogOpen()
+        private void SaveDialogOpen(bool closeAfterNotSave)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.DefaultExt = ".xmi";
@@ -83,7 +84,7 @@ namespace UML_Diagram_Designer.ViewModels
                 UmlXmiSerializer serializer = new UmlXmiSerializer();
                 serializer.WriteModelToFile(fileName, _diagramViewModel.ImmutableModel);
             }
-
+            if (!closeAfterNotSave) return;
             this.Items.Remove(this._diagramViewModel);
             this.Items.Remove(this._diagramEditorViewModel);
         }

@@ -4,7 +4,9 @@ using System.Text;
 
 namespace UML_Diagram_Designer.Models.EdgeLayouts
 {
-    class AggregationEdgeLayout
+    public class AggregationEdgeLayout : EdgeLayout
     {
+        public AggregationEdgeLayout(GraphLayout graph, NodeLayout source, NodeLayout target, object edgeObject) : base(graph, source, target, edgeObject) { }
+
     }
 }

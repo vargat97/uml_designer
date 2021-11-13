@@ -11,14 +11,14 @@ namespace UML_Diagram_Designer.Models
 {
     public abstract class EdgeLayout
     {
-        private double TriangleSideLenght = 20;
-        private GraphLayout _graph;
-        private object _edgeObject;
-        private IntPtr _graphVizEdge;
-        private NodeLayout _source;
-        private NodeLayout _target;
+        private readonly double TriangleSideLenght = 20;
+        private readonly GraphLayout _graph;
+        private readonly object _edgeObject;
+        private readonly IntPtr _graphVizEdge;
+        private readonly NodeLayout _source;
+        private readonly NodeLayout _target;
         protected PathGeometry _pathGeometry;
-        internal EdgeLayout(GraphLayout graph,NodeLayout source, NodeLayout target, object edgeObject)
+        protected EdgeLayout(GraphLayout graph,NodeLayout source, NodeLayout target, object edgeObject)
         {
             this._pathGeometry = new PathGeometry();
             _graph = graph;
@@ -43,7 +43,7 @@ namespace UML_Diagram_Designer.Models
             set
             {
                 this._pathGeometry = value;
-                CreateTriangleGeometry(value);
+                CreateTriangleGeometry();
             }
         }
 
@@ -105,7 +105,7 @@ namespace UML_Diagram_Designer.Models
             PathGeometry = path;
         }
 
-        private void CreateTriangleGeometry(PathGeometry bezierGeometry)
+        private void CreateTriangleGeometry()
         {
             var pathfigure = new PathFigure();
             var pathfigure1 = new PathFigure();
