@@ -105,6 +105,12 @@ namespace UML_Diagram_Designer.ViewModels
         {
             //TODO
         }
+
+        /// <summary>
+        /// Change the selected immutableObject's name.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void ChangeObjectName(TextBox sender, System.EventArgs e)
         {
             var immutableObject = this.DetailsObject;
@@ -155,12 +161,51 @@ namespace UML_Diagram_Designer.ViewModels
             EdgeLayout = null;
             this.PublishEvent();
         }
-
+        /// <summary>
+        /// Removes the selected Generalization from the Model
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void RemoveGeneralizationFromModel(object sender, RoutedEventArgs e)
         {
             var generalization = (Generalization)EdgeLayout.EdgeObject;
             var immutableModel = this._functions.RemoveGeneralizationFromModel(generalization);
             this._immutableModel = immutableModel;
+            this.PublishEvent();
+        }
+        /// <summary>
+        /// Removes the selected Dependency from the model
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void RemoveDependencyFromModel(object sender, RoutedEventArgs e)
+        {
+            var dependecy = (Dependency)EdgeLayout.EdgeObject;
+            var immutableModel = this._functions.RemoveDependencyFromModel(dependecy);
+            this._immutableModel = immutableModel;
+            this.PublishEvent();
+        }
+        /// <summary>
+        /// Removes the selected EnumerationLiteral from the model
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void RemoveEnumerationLiteral(object sender, RoutedEventArgs e)
+        {
+            var literal = (EnumerationLiteral)DetailsObject;
+            var immutableModel = this._functions.RemoveEnumerationLiteralFromModel(literal);
+            DetailsObject = null;
+            this._immutableModel = immutableModel;
+            this.PublishEvent();
+        }
+
+        //TODO
+        public void RemoveAssociationFromModel(object sender, RoutedEventArgs e)
+        {
+            var association = (Association)EdgeLayout.EdgeObject;
+            var immutableModel = this._functions.RemoveAssociationFromModel(association);
+            this._immutableModel = immutableModel;
+            EdgeLayout = null;
             this.PublishEvent();
         }
 
@@ -195,7 +240,8 @@ namespace UML_Diagram_Designer.ViewModels
         {
             if(e.Key == Key.Enter)
             {
-                this.ChangeName((TextBox)sender,e);
+                if(NodeLayout != null || EdgeLayout != null )this.ChangeName((TextBox)sender,e);
+                else { this.ChangeObjectName((TextBox)sender, e); }
             }
         }
         /// <summary>
@@ -205,9 +251,7 @@ namespace UML_Diagram_Designer.ViewModels
         /// <returns>No return value</returns>
         public void RemoveInterfaceFromModel()
         {
-            //TODO
             var immutableObject = (ImmutableObject)this.NodeLayout.NodeObject;
-           
             var immutableModel = this._functions.RemoveInterfaceFromModel((Interface)immutableObject);
             this._immutableModel = immutableModel;
             EdgeLayout = null;
@@ -218,7 +262,12 @@ namespace UML_Diagram_Designer.ViewModels
         /// </summary>
         public void RemoveEnumFromTheModel()
         {
-            //TODO
+            var immutableObject = (ImmutableObject)this.NodeLayout.NodeObject;
+            var immutableModel = this._functions.RemoveEnumFromModel((Enumeration)immutableObject);
+            this._immutableModel = immutableModel;
+            NodeLayout = null;
+            this.PublishEvent();
+
         }
         /// <summary>
         /// If the nodelayout's nodeobject is not abstract, than set it as abstarct
@@ -236,33 +285,43 @@ namespace UML_Diagram_Designer.ViewModels
             this.PublishEvent();
         }
 
-
+        /// <summary>
+        /// Adds a new parameter to the given operation with a random name, and a type of the operation's classifier.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void AddParameterToOperation(Button sender,RoutedEventArgs e)
         {
-            var operationObject = (ImmutableObject)(sender.DataContext);
-            var personGenerator = new PersonNameGenerator();
-            var name = personGenerator.GenerateRandomFirstAndLastName();
-            var parametertype = operationObject.MParent;
-            var immutableModel = this._functions.AddNewParameterToOperation(name, parametertype, operationObject);
+            var operationObject = DetailsObject;
+            var immutableModel = this._functions.AddNewParameterToOperation(operationObject);
             this._immutableModel = immutableModel;
             this.PublishEvent();
         }
 
+        /// <summary>
+        /// Removes the given property from the model
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void RemoveProperty(Button sender, RoutedEventArgs e)
         {
-            var asd = sender.DataContext;
-            var immutableModel = this._functions.RemovePropertyObject((Property)asd);
-
+            var immutableObject = DetailsObject;
+            var immutableModel = this._functions.RemovePropertyObject((Property)immutableObject);
             this._immutableModel = immutableModel;
             DetailsObject = null;
             this.PublishEvent();
         }
 
+        /// <summary>
+        /// Removes the operation from the model
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void RemoveOperation(Button sender, RoutedEventArgs e)
         {
-            var asd = sender.DataContext;
-            var immutableModel = this._functions.RemoveOperationObject((Operation)asd);
-
+            var operationObject = DetailsObject;
+            var immutableModel = this._functions.RemoveOperationObject((Operation)operationObject);
+            DetailsObject = null;
             this._immutableModel = immutableModel;
             this.PublishEvent();
         }
@@ -303,15 +362,76 @@ namespace UML_Diagram_Designer.ViewModels
             RelationShipObject = this._functions.CreateGeneralization();
         }
 
-        public void AddAttributeToClassifier(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Adds a new attribute to the class with a random name
+        /// User can edit that by clickink the new attribute
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void AddAttributeToClass(object sender, RoutedEventArgs e)
         {
-            var immutableModel = this.CreateProperty();
+            var classObject = (Class)NodeLayout.NodeObject;
+            var immutableModel = this._functions.CreateAttributeToClass(classObject);
             this._immutableModel = immutableModel;
             this.PublishEvent();
         }
 
+        /// <summary>
+        /// Adds a new operation to the class with a random name
+        /// User can edit the nam later by clicking the new operation
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void AddOperationToClass(object sender, RoutedEventArgs e)
+        {
+            var classObject = (Class)NodeLayout.NodeObject;
+            var immutableModel = this._functions.CreateOperationToClass(classObject);
+            this._immutableModel = immutableModel;
+            this.PublishEvent();
+        }
 
+        /// <summary>
+        /// Adds a new attribute to the interface with a random name
+        /// User can edit the name of the interface later by clicking the new property's name
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void AddAttributeToInterface(object sender, RoutedEventArgs e)
+        {
+            var interfaceObject = (Interface)NodeLayout.NodeObject;
+            var immutableModel = this._functions.CreateAttributeToInterface(interfaceObject);
+            this._immutableModel = immutableModel;
+            this.PublishEvent();
+        }
 
+        /// <summary>
+        /// Adds a new operation to the interface with a random name
+        /// User can edit the name of the interface later by clicking the new operation's name
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void AddOperationToInterface(object sender, RoutedEventArgs e)
+        {
+            var interfaceObject = (Interface)NodeLayout.NodeObject;
+            var immutableModel = this._functions.CreateOperationToInterface(interfaceObject);
+            this._immutableModel = immutableModel;
+            this.PublishEvent();
+        }
+        /// <summary>
+        /// Adds a new enumerationLiteral to the enumeration with a random name
+        /// User can edit the name of the enumrationliteral by clicking the new literal's name
+        /// </summary>
+        public void AddEnumLiteralToEnum()
+        {
+            var immutableObject = (ImmutableObject)NodeLayout.NodeObject;
+            var immutableModel = this._functions.CreateEnumLiteralToEnumeration((Enumeration)immutableObject);
+            this._immutableModel = immutableModel;
+            this.PublishEvent();
+        }
+        public void OpenEditEnumLiteral()
+        {
+            //TODO: OPEN the selected enumliteral
+        }
 
         public void CreateClass()
         {
@@ -330,13 +450,6 @@ namespace UML_Diagram_Designer.ViewModels
         public void CreateEnum()
         {
             var immutableModel = this._createEnum();
-            this._immutableModel = immutableModel;
-            this.PublishEvent();
-        }
-
-        public void CreateEnumLiteral()
-        {
-            var immutableModel = this._functions.CreateEnumLiteral((ImmutableObject)NodeLayout.NodeObject, "Asd");
             this._immutableModel = immutableModel;
             this.PublishEvent();
         }
@@ -384,27 +497,6 @@ namespace UML_Diagram_Designer.ViewModels
 
         }
 
-        private ImmutableModel CreateProperty()
-        {
-
-            var personGenerator = new PersonNameGenerator();
-            var name = personGenerator.GenerateRandomFirstAndLastName();
-
-            var mutableModel = this._immutableModel.ToMutable();
-            this._factory = new UmlFactory(mutableModel);
-            var propertyBuilder = this._factory.Property();
-            propertyBuilder.MName = name;
-            mutableModel.ResolveObject(propertyBuilder.MId);
-            var propertyObject = propertyBuilder.ToImmutable();
-            var classObject = ((Classifier)NodeLayout.NodeObject).ToMutable();
-            var classBuilder = (ClassBuilder)classObject;
-            propertyBuilder.SetClassLazy(propertyBuilder1 => classBuilder);
-            mutableModel.MergeObjects(mutableModel.GetObject(propertyObject), propertyBuilder);
-            mutableModel.MergeObjects(mutableModel.GetObject(classObject), classBuilder);
-
-
-            return mutableModel.ToImmutable();
-        }
 
         private void FillModelsTypesCollection()
         {

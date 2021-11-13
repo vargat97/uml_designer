@@ -48,7 +48,6 @@
                                         <Grid>
                                             <TextBlock MouseLeftButtonDown="{s:Action TextBlockClick}">
                                                 <TextBlock.Text>
-
                                                     <MultiBinding Converter="{StaticResource attributeVisibilityConverter}">
                                                         <Binding Path="Visibility" />
                                                         <Binding Path="MName" />
@@ -73,7 +72,6 @@
                                                         <Binding Path="MName" />
                                                         <Binding Path="OwnedParameter" />
                                                     </MultiBinding>
-
                                                 </TextBlock.Text>
                                             </TextBlock>
                                         </Grid>
@@ -97,13 +95,24 @@
                             <RowDefinition Height="auto" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="{Binding NodeObject.MName}" />
+                        <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="{Binding NodeObject.MName}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" >
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding NodeObject.IsAbstract, Mode=OneWay}"
+                                                 Value="True">
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                         <Separator VerticalAlignment="Center" Grid.Row="1"/>
                         <ItemsControl ItemsSource="{Binding AllAttributes }" Grid.Row="2">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <TextBlock>
+                                        <TextBlock MouseLeftButtonDown="{s:Action TextBlockClick}">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource attributeVisibilityConverter}">
                                                     <Binding Path="Visibility" />
@@ -121,7 +130,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <TextBlock>
+                                        <TextBlock MouseLeftButtonDown="{s:Action SelectOperation}">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource opertaionVisibilityConverter}">
                                                     <Binding Path="Visibility"/>
@@ -166,7 +175,7 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Grid>
-                                            <TextBlock>
+                                            <TextBlock MouseLeftButtonDown="{s:Action SelectEnumerationLiteral}">
                                                 <TextBlock.Text>
                                                     <MultiBinding Converter="{StaticResource enumVisibilityConverter}">
                                                         <Binding Path="Visibility" />

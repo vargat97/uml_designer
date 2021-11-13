@@ -6,6 +6,7 @@
         xmlns:s="https://github.com/canton7/Stylet"
         xmlns:local="clr-namespace:UML_Diagram_Designer.Views"
         mc:Ignorable="d" Background="Yellow"
+        Name="MainWindow"
         Title="Diagram Designer" Height="{Binding Source={x:Static SystemParameters.WorkArea}, Path=Height}" Width="{Binding Source={x:Static SystemParameters.WorkArea}, Path=Width}">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -26,14 +27,14 @@
                 <MenuItem Header="File" Background="Green"/>
                 <MenuItem Header="Open" Background="Green" Command="{s:Action OpenFile}"/>
                 <MenuItem Header="Create" Background="Green" Command="{s:Action CreateNewModel}"/>
-                <MenuItem Header="Save" Background="Green"/>
+                <MenuItem Header="Save" Background="Green" Command="{s:Action SaveModel}"/>
                 <MenuItem Header="Settings" Background="Green"/>
                 <MenuItem Header="Exit" Background="Green" Command="{s:Action ExitProgram}" />
             </Menu>
         </DockPanel>
 
         <ContentControl Grid.Row="2" Grid.Column="1" s:View.Model="{Binding Items[0]}">
-            
+
         </ContentControl>
 
         <DockPanel Grid.Column="2" Grid.Row="2" >

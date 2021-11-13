@@ -1,5 +1,6 @@
 ﻿using MetaDslx.Languages.Uml.Model;
 using MetaDslx.Modeling;
+using RandomNameGeneratorLibrary;
 using Stylet;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,11 @@ namespace UML_Diagram_Designer.Models
 
             return this._immutableModel;
         }
+        /// <summary>
+        /// Removes the property from the model. If the property is member of an association, then removes the association too
+        /// </summary>
+        /// <param name="immutableObject">Property, what we would like to remove</param>
+        /// <returns>Returns an ImmutableModel, which does not contain the property</returns>
         public ImmutableModel RemovePropertyObject(Property immutableObject)
         {
             if(immutableObject.Association != null)
@@ -53,18 +59,113 @@ namespace UML_Diagram_Designer.Models
             }
             if(immutableObject.Aggregation != AggregationKind.None)
             {
-
+                //TODO
             }
             this.RemoveObject(immutableObject);
             return this._immutableModel;
         }
+        /// <summary>
+        /// Removes the operation, and its children from the model
+        /// </summary>
+        /// <param name="immutableObject">Operation, what we would like to remove</param>
+        /// <returns>Return an ImmutableModel, which doesnot contain the operation</returns>
         public ImmutableModel RemoveOperationObject(Operation immutableObject)
         {
             this.RemoveOperationObjectAndItsChildren(immutableObject);
             return this._immutableModel;
         }
+
         /// <summary>
-        /// Removes the given Class object, and its all children from the model</summary>
+        /// Creates an attribute for the given class and set its name as random
+        /// </summary>
+        /// <param name="classObject">Class object, where we would like to add a new attribute</param>
+        /// <returns></returns>
+        public ImmutableModel CreateAttributeToClass(Class classObject)
+        {
+            //Create the property/attribute
+            var propertyBuilder = this.CreateProperty().ToMutable();
+            var mutableModel = this._immutableModel.ToMutable();
+
+            //Resolve the property
+            mutableModel.ResolveObject(propertyBuilder.MId);
+
+            var propertyObject = propertyBuilder.ToImmutable();
+            var classBuilder = classObject.ToMutable();
+            propertyBuilder.SetClassLazy(propertyBuilder1 => classBuilder);
+            mutableModel.MergeObjects(mutableModel.GetObject(propertyObject), propertyBuilder);
+            mutableModel.MergeObjects(mutableModel.GetObject(classObject), classBuilder);
+
+            this._immutableModel = mutableModel.ToImmutable();
+            return this._immutableModel;
+        }
+        /// <summary>
+        /// Creates an operation to the given class with a random name
+        /// </summary>
+        /// <param name="classObject">The class object, where we would like to create an operation</param>
+        /// <returns>A new immutableModel, which noe contains the new operation</returns>
+        public ImmutableModel CreateOperationToClass(Class classObject)
+        {
+            var operationBuilder = this.CreateOperation().ToMutable();
+            var mutableModel = this._immutableModel.ToMutable();
+
+            mutableModel.ResolveObject(operationBuilder.MId);
+
+            var operationObject = operationBuilder.ToImmutable();
+            var classBuilder = classObject.ToMutable();
+            operationBuilder.SetClassLazy(cb => classBuilder);
+            mutableModel.MergeObjects(mutableModel.GetObject(operationObject), operationBuilder);
+            mutableModel.MergeObjects(mutableModel.GetObject(classObject), classBuilder);
+
+            this._immutableModel = mutableModel.ToImmutable();
+            return this._immutableModel;
+        }
+        /// <summary>
+        /// Creates an attribute for the given interface and set its name as random
+        /// </summary>
+        /// <param name="interfaceObject">Interface object, where we would like to add a new attribute</param>
+        /// <returns></returns>
+        public ImmutableModel CreateAttributeToInterface(Interface interfaceObject)
+        {
+            var propertyBuilder = this.CreateProperty().ToMutable();
+            var mutableModel = this._immutableModel.ToMutable();
+
+            mutableModel.ResolveObject(propertyBuilder.MId);
+
+            var propertyObject = propertyBuilder.ToImmutable();
+            var interfaceBuilder = interfaceObject.ToMutable();
+            propertyBuilder.SetInterfaceLazy(cb => interfaceBuilder);
+            mutableModel.MergeObjects(mutableModel.GetObject(propertyObject), propertyBuilder);
+            mutableModel.MergeObjects(mutableModel.GetObject(interfaceObject), interfaceBuilder);
+
+            this._immutableModel = mutableModel.ToImmutable();
+            return this._immutableModel;
+        }
+        /// <summary>
+        /// Creates an operation to the given interface with a random name
+        /// </summary>
+        /// <param name="interfaceObject">The interface object, where we would like to create an operation</param>
+        /// <returns>A new immutableModel, which noe contains the new operation</returns>
+        public ImmutableModel CreateOperationToInterface(Interface interfaceObject)
+        {
+            var operationBuilder = this.CreateOperation().ToMutable();
+            var mutableModel = this._immutableModel.ToMutable();
+
+            mutableModel.ResolveObject(operationBuilder.MId);
+
+            var operationObject = operationBuilder.ToImmutable();
+            var interfaceBuilder = interfaceObject.ToMutable();
+
+            operationBuilder.SetInterfaceLazy(ib => interfaceBuilder);
+            mutableModel.MergeObjects(mutableModel.GetObject(operationObject), operationBuilder);
+            mutableModel.MergeObjects(mutableModel.GetObject(interfaceObject), interfaceBuilder);
+
+            this._immutableModel = mutableModel.ToImmutable();
+            return this._immutableModel;
+        }
+        /// <summary>
+        /// Removes the given Class object, and its all children from the model
+        /// Removes the appropriate interfacerealizations, dependencies, and associations from the model
+        /// </summary>
         /// <param name="classObject">Class object, what we would like to remove from the model</param>
         /// <returns>Return a Model, which does not contain the given object</returns>
         public ImmutableModel RemoveClassObjectFromModel(Class classObject)
@@ -75,12 +176,18 @@ namespace UML_Diagram_Designer.Models
                 this.RemoveClassifierChilds(child);
             }
             this.RemoveGeneralizationDependsOnClass(classObject);
-            this.RemoveDependencyDependsOnClassifier(classObject);
+            this.RemoveDependencyDependsOnImmutableObject(classObject);
             this.RemoveInterfaceRealizationDependsOnClass(classObject);
-           this.RemoveObject(classObject);
+            this.RemoveObject(classObject);
             return this._immutableModel;
         }
 
+        /// <summary>
+        /// Removes the given Interface object from the model, and its all children from the model
+        /// Removes the all relevan interfacerealizations, dependencies, association from the model too
+        /// </summary>
+        /// <param name="interfaceObject"></param>
+        /// <returns></returns>
         public ImmutableModel RemoveInterfaceFromModel(Interface interfaceObject)
         {
             foreach (var child in interfaceObject.MChildren)
@@ -88,13 +195,18 @@ namespace UML_Diagram_Designer.Models
                 this.RemoveClassifierChilds(child);
             }
             this.RemoveInterfaceRealizationDependsOnInterface(interfaceObject);
-            this.RemoveDependencyDependsOnClassifier(interfaceObject);
+            this.RemoveDependencyDependsOnImmutableObject(interfaceObject);
             this.RemoveAssociationEndParamaterDependsOnClassifier(interfaceObject);
             this.RemoveObject(interfaceObject);
             return this._immutableModel;
         }
 
-
+        /// <summary>
+        /// Removes the class child from the model
+        /// If operation, than calls RemoveOperationObjectAndItsChildren
+        /// else calls RemovePropertyFromClass
+        /// </summary>
+        /// <param name="child"></param>
         private void RemoveClassifierChilds(ImmutableObject child)
         {
             if(child.MMetaClass.MName == "Operation")
@@ -144,6 +256,7 @@ namespace UML_Diagram_Designer.Models
             }
             this.RemoveObject(association);
         }
+        
         /// <summary>
         /// Removes all the generalization depends on the parameter classObject
         /// </summary>
@@ -163,6 +276,11 @@ namespace UML_Diagram_Designer.Models
                 }
             }
         }
+        
+        /// <summary>
+        /// Removes all the interfacerealization what tha class object realized previously
+        /// </summary>
+        /// <param name="classObject">A class object, what we would like to remove, and for that, we have to remove all the appropriate realized interfaces</param>
         private void RemoveInterfaceRealizationDependsOnClass(Class classObject)
         {
             if(classObject.InterfaceRealization != null)
@@ -176,6 +294,11 @@ namespace UML_Diagram_Designer.Models
                 }
             }
         }
+        
+        /// <summary>
+        /// Removes the association and all members of the association, if one of the member is the parameter classifierobject
+        /// </summary>
+        /// <param name="classifierObject">For the classifierObject remove, have to remove all the appropriate association and parameter</param>
         private void RemoveAssociationEndParamaterDependsOnClassifier(Classifier classifierObject)
         {
             foreach (var modelObject in this._immutableModel.Objects)
@@ -197,6 +320,11 @@ namespace UML_Diagram_Designer.Models
                 }
             }
         }
+        
+        /// <summary>
+        /// Removes all the interfacerealization what belongs to that given interface
+        /// </summary>
+        /// <param name="interfaceObject">Interface object, what we would like to remove</param>
         private void RemoveInterfaceRealizationDependsOnInterface(Interface interfaceObject)
         {
             foreach (var modelObject in this._immutableModel.Objects)
@@ -223,7 +351,12 @@ namespace UML_Diagram_Designer.Models
                 }
             }
         }
-        private void RemoveDependencyDependsOnClassifier(ImmutableObject classObject)
+        /// <summary>
+        /// Removes the dependencies which are depends on the classifier object
+        /// For the classifier remove, we had to remove the appropriate dependencies too
+        /// </summary>
+        /// <param name="classObject">A classifier object, from what the dependency is depends on</param>
+        private void RemoveDependencyDependsOnImmutableObject(ImmutableObject classObject)
         {
             foreach (var modelObject in this._immutableModel.Objects)
             {
@@ -270,6 +403,39 @@ namespace UML_Diagram_Designer.Models
                 
             }
         }
+       
+        /// <summary>
+        /// Creates a property object with a random name
+        /// </summary>
+        /// <returns>Returns with the created property object</returns>
+        private Property CreateProperty()
+        {
+            var personGenerator = new PersonNameGenerator();
+            var name = personGenerator.GenerateRandomFirstAndLastName();
+
+            var mutableModel = this._immutableModel.ToMutable();
+            var factory = new UmlFactory(mutableModel);
+            var propertyBuilder = factory.Property();
+            propertyBuilder.MName = name;
+
+            return propertyBuilder.ToImmutable();
+        }
+        /// <summary>
+        /// Creates an operation with a random name
+        /// </summary>
+        /// <returns>Returns with the created operation object</returns>
+        private Operation CreateOperation()
+        {
+            var personGenerator = new PersonNameGenerator();
+            var name = personGenerator.GenerateRandomFirstAndLastName();
+
+            var mutableModel = this._immutableModel.ToMutable();
+            var factory = new UmlFactory(mutableModel);
+            var operationBuilder = factory.Operation();
+            operationBuilder.MName = name;
+
+            return operationBuilder.ToImmutable();
+        }
         /// <summary>
         /// Removes the interfacerealization from the model. Removes the connection from the two side of the realiztion, then remove itself
         /// Removes also the realized interface's attributes and operations from the owner's classifier
@@ -284,11 +450,78 @@ namespace UML_Diagram_Designer.Models
             this.RemoveObject(mutableObejct.ToImmutable());
             return this._immutableModel;
         }
-        public ImmutableModel RemoveGeneralizationFromModel(ImmutableObject immutableObject)
+        
+        /// <summary>
+        /// Removes the given enum and its child from the model
+        /// </summary>
+        /// <param name="enumObject"></param>
+        /// <returns></returns>
+        public ImmutableModel RemoveEnumFromModel(Enumeration enumObject)
         {
+            foreach(var child in enumObject.MChildren)
+            {
+                this.RemoveObject(child);
+            }
+            this.RemoveDependencyDependsOnImmutableObject(enumObject);
+            this.RemoveObject(enumObject);
+            return this._immutableModel;
+        }
+
+        /// <summary>
+        /// Removes the selected generalization from the model
+        /// </summary>
+        /// <param name="immutableObject">Generalization, what we would like to remove</param>
+        /// <returns>An ImmutableModel which does not contain the selected generalization</returns>
+        public ImmutableModel RemoveGeneralizationFromModel(Generalization immutableObject)
+        {
+            var generalizationBuilder = immutableObject.ToMutable();
+            generalizationBuilder.SetGeneralLazy(cb => null);
+            generalizationBuilder.SetSpecificLazy(cb => null);
             this.RemoveObject(immutableObject);
             return this._immutableModel;
         }
+        
+        /// <summary>
+        /// Removes the selected dependency from the model
+        /// </summary>
+        /// <param name="immutableObject">Dependenc object what we would like to remove</param>
+        /// <returns>An immutableModel which does not contain the selected generalization</returns>
+        public ImmutableModel RemoveDependencyFromModel(Dependency immutableObject)
+        {
+            var dependencyBuilder = immutableObject.ToMutable();
+            dependencyBuilder.SetOwnerLazy(eb => null);
+            this.RemoveObject(dependencyBuilder.ToImmutable());
+            return this._immutableModel;
+        }
+
+        /// <summary>
+        /// Removes enumerationliteral from the model
+        /// </summary>
+        /// <param name="literal"></param>
+        /// <returns>a ImmutableModel which does not contain the literal</returns>
+        public ImmutableModel RemoveEnumerationLiteralFromModel(EnumerationLiteral literal)
+        {
+            this.RemoveObject(literal);
+            return this._immutableModel;
+        }
+
+        public ImmutableModel RemoveAssociationFromModel(Association association)
+        {
+            foreach(var member in association.Member)
+            {
+                this.RemoveObject(member);
+            }
+            this.RemoveObject(association);
+            return this._immutableModel;
+        }
+
+
+        /// <summary>
+        /// Modify the selected object's name. 
+        /// </summary>
+        /// <param name="obj">Selected namedElement, which name we want to modify</param>
+        /// <param name="newName">New name</param>
+        /// <returns>An ImmutableModel, which contains now the namedelement whit the new name</returns>
         public ImmutableModel ModifyObjectName(ImmutableObject obj, string newName)
         {
             if (this._immutableModel.ContainsObject(obj))
@@ -305,30 +538,43 @@ namespace UML_Diagram_Designer.Models
             }
             return this._immutableModel;
         }
-        public ImmutableModel CreateEnumLiteral(ImmutableObject enumObject, string name)
+        /// <summary>
+        /// Creates a new EnumearationLiteral for the enumObject with a random name
+        /// </summary>
+        /// <param name="enumObject">The enumeration object, where we would like to create a new enumerationliteral object</param>
+        /// <returns>ImmutableModel, which contains the created enumerationLiteral</returns>
+        public ImmutableModel CreateEnumLiteralToEnumeration(ImmutableObject enumObject)
         {
-            var enumLiteral = (EnumerationLiteral)this._createEnumLiteral(name);
+
+            var enumLiteral = (EnumerationLiteral)this.CreateEnumLiteral();
             var mutableModel = this._immutableModel.ToMutable();
 
             var enumLiteralBuilder = enumLiteral.ToMutable();
             mutableModel.ResolveObject(enumLiteralBuilder.MId);
 
             var enumBuilder = (EnumerationBuilder)enumObject.ToMutable();
-
             enumLiteralBuilder.SetEnumerationLazy(elb => enumBuilder);
 
             mutableModel.MergeObjects(mutableModel.GetObject((Enumeration)enumObject), enumBuilder);
             mutableModel.MergeObjects(mutableModel.GetObject(enumLiteral), enumLiteralBuilder);
             return mutableModel.ToImmutable();
         }
-        private ImmutableObject _createEnumLiteral(string name)
+
+        /// <summary>
+        /// Creates a new EnumerationLiteral with a random name
+        /// </summary>
+        /// <returns>The create EnumerationLiteral object</returns>
+        private ImmutableObject CreateEnumLiteral()
         {
-                var mutableModel = this._immutableModel.ToMutable();
-                var factory = new UmlFactory(mutableModel);
-                var enumerationLiteralBuilder = factory.EnumerationLiteral();
-                enumerationLiteralBuilder.MName = name;
+            var personGenerator = new PersonNameGenerator();
+            var name = personGenerator.GenerateRandomFirstAndLastName();
+
+            var mutableModel = this._immutableModel.ToMutable();
+            var factory = new UmlFactory(mutableModel);
+            var enumerationLiteralBuilder = factory.EnumerationLiteral();
+            enumerationLiteralBuilder.MName = name;
                
-                return enumerationLiteralBuilder.ToImmutable();
+            return enumerationLiteralBuilder.ToImmutable();
             
         }
         public ImmutableObject CreateAssociation()
@@ -389,13 +635,19 @@ namespace UML_Diagram_Designer.Models
 
             return mutableModel.ToImmutable();
         }
-        public ImmutableModel AddNewParameterToOperation(string parameterName,ImmutableObject parameterType,ImmutableObject operationObject)
+        public ImmutableModel AddNewParameterToOperation(ImmutableObject operationObject)
         {
-            var parameter = this.CreateParameter(parameterName);
-            this.SetObjectType(parameter, parameterType);
+            var mutableModel = this._immutableModel.ToMutable();
+            var parameter = this.CreateParameter();
+            var parameterBuilder = parameter.ToMutable();
             var parameterDirection = ParameterDirectionKind.In;
-            this.setParameterToOperation(operationObject, parameter, parameterDirection);
 
+            //Resolve parameter
+            mutableModel.ResolveObject(parameterBuilder.MId);
+            //Set parameter's type
+            this.SetObjectType(parameter, operationObject.MParent);
+            //Set parameter's direction
+            this.setParameterToOperation(operationObject, parameter, parameterDirection);
             return this._immutableModel;
         }
        
@@ -465,13 +717,20 @@ namespace UML_Diagram_Designer.Models
             mutableModel.MergeObjects(this._immutableModel.GetObject(parameterObject).ToMutable(), parameterBuilder);
             this._immutableModel = mutableModel.ToImmutable();
         }
-        private ImmutableObject CreateParameter(string parameterName)
+
+        /// <summary>
+        /// Creates a new parameter with a random name
+        /// </summary>
+        /// <returns>Returns with the newly created paramter object</returns>
+        private ImmutableObject CreateParameter()
         {
+            var personGenerator = new PersonNameGenerator();
+            var parameterName = personGenerator.GenerateRandomFirstAndLastName();
+
             var mutableModel = this._immutableModel.ToMutable();
             var factory = new UmlFactory(mutableModel);
             var parameterBuilder = factory.Parameter();
             parameterBuilder.MName = parameterName;
-            mutableModel.ResolveObject(parameterBuilder.MId);
             this._immutableModel = mutableModel.ToImmutable();
             return parameterBuilder.ToImmutable();
         }

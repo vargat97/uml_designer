@@ -42,7 +42,7 @@ namespace UML_Diagram_Designer.ViewModels
                 SetAndNotify(ref this._canvasSize, value);
             }
         }
-        private ImmutableModel ImmutableModel
+        public ImmutableModel ImmutableModel
         {
             get { return this._immutableModel; }
             set
@@ -173,6 +173,15 @@ namespace UML_Diagram_Designer.ViewModels
             this._diagramEditorViewModel.NodeLayout = null;
             var datacontext = (((TextBlock)sender).DataContext);
             this._diagramEditorViewModel.DetailsObject = (Operation)datacontext;
+        }
+
+        public void SelectEnumerationLiteral(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+            this._diagramEditorViewModel.NodeLayout = null;
+            this._diagramEditorViewModel.EdgeLayout = null;
+            var datacontext = (((TextBlock)sender).DataContext);
+            this._diagramEditorViewModel.DetailsObject = (EnumerationLiteral)datacontext;
         }
         public void Handle(ImmutableModelChangedEvent message)
         {
