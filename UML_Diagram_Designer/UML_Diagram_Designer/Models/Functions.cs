@@ -76,6 +76,17 @@ namespace UML_Diagram_Designer.Models
         }
 
         /// <summary>
+        /// Removes the selected Parameter from the model
+        /// </summary>
+        /// <param name="parameter">Parameter, what we would like to remove from model</param>
+        /// <returns>An ImmutableModel, which does not contain the selected parameter</returns>
+        public ImmutableModel RemoveParameterFromModel(Parameter parameter)
+        {
+            this.RemoveObject(parameter);
+            return this._immutableModel;
+        }
+
+        /// <summary>
         /// Creates an attribute for the given class and set its name as random
         /// </summary>
         /// <param name="classObject">Class object, where we would like to add a new attribute</param>
@@ -538,6 +549,21 @@ namespace UML_Diagram_Designer.Models
             }
             return this._immutableModel;
         }
+
+        public ImmutableModel ModifyObjectType(ImmutableObject immutableObject, ImmutableObject type)
+        {
+            if (!this._immutableModel.ContainsObject(immutableObject) || !this._immutableModel.ContainsObject(type)) return this._immutableModel;
+            var mutableModel = this._immutableModel.ToMutable();
+            var typedElementBuilder = (TypedElementBuilder)immutableObject.ToMutable();
+            var typeBuilder = (TypeBuilder)type.ToMutable();
+
+            typedElementBuilder.SetTypeLazy(tb => typeBuilder);
+            mutableModel.MergeObjects(mutableModel.GetObject(immutableObject), typedElementBuilder);
+            this._immutableModel = mutableModel.ToImmutable();
+
+            return this._immutableModel;
+        }
+
         /// <summary>
         /// Creates a new EnumearationLiteral for the enumObject with a random name
         /// </summary>
@@ -577,6 +603,7 @@ namespace UML_Diagram_Designer.Models
             return enumerationLiteralBuilder.ToImmutable();
             
         }
+
         public ImmutableObject CreateAssociation()
         {
             var mutableModel = this._immutableModel.ToMutable();

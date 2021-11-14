@@ -34,6 +34,12 @@ namespace UML_Diagram_Designer.ViewModels
             get;
             set;
         }
+
+        public Brush EdgeHoverStroke
+        {
+            get; set;
+        }
+
         public Point CanvasSize
         {
             get { return this._canvasSize; }
@@ -72,7 +78,7 @@ namespace UML_Diagram_Designer.ViewModels
             }
         }
 
-        public DiagramViewModel(ImmutableModel immutableModel,DiagramEditorViewModel diagramEditorViewModel,IEventAggregator eventAggregator)
+        public DiagramViewModel(ImmutableModel immutableModel, DiagramEditorViewModel diagramEditorViewModel, IEventAggregator eventAggregator)
         {
             eventAggregator.Subscribe(this);
             this._diagramEditorViewModel = diagramEditorViewModel;
@@ -80,6 +86,7 @@ namespace UML_Diagram_Designer.ViewModels
             GraphLayout = this.LoadLayoutFromModel();
             Scale = 1;
             CreateEdgeLine = new Line();
+            EdgeHoverStroke = Brushes.Transparent;
         }
         public void CanvasSizeChanged(Panel sender, SizeChangedEventArgs e)
         {
@@ -106,7 +113,7 @@ namespace UML_Diagram_Designer.ViewModels
             if (_diagramEditorViewModel.IsCreateRealtionShip)
             {
                 var p = layout.Position;
-                this.DrawCreateEdgeLine(new Point(p.X,p.Y));
+                this.DrawCreateEdgeLine(new Point(p.X, p.Y));
                 return;
             }
 
@@ -142,9 +149,9 @@ namespace UML_Diagram_Designer.ViewModels
             var relativeTo = (FrameworkElement)sender;
             var p = e.GetPosition(relativeTo);
 
-      
 
-            CreateEdgeLine.X2 = p.X  - 100;
+
+            CreateEdgeLine.X2 = p.X - 100;
             CreateEdgeLine.Y2 = p.Y - 50;
 
         }
@@ -155,7 +162,7 @@ namespace UML_Diagram_Designer.ViewModels
             this._diagramEditorViewModel.DetailsObject = null;
             var datacontext = (((Path)sender).DataContext);
             var layout = (EdgeLayout)datacontext;
-            object layoutInstance = Convert.ChangeType(layout, datacontext.GetType());    
+            object layoutInstance = Convert.ChangeType(layout, datacontext.GetType());
 
             this._diagramEditorViewModel.EdgeLayout = (EdgeLayout)layoutInstance;
         }
@@ -186,7 +193,7 @@ namespace UML_Diagram_Designer.ViewModels
         public void Handle(ImmutableModelChangedEvent message)
         {
             ImmutableModel = message.ImmutableModel;
-            
+
         }
         public void ZoomOut()
         {
@@ -248,6 +255,11 @@ namespace UML_Diagram_Designer.ViewModels
             graphLayout.ComputeLayout();
 
             return graphLayout;
+        }
+
+        public void EdgeHover()
+        {
+            EdgeHoverStroke = Brushes.Green;
         }
         /*
         

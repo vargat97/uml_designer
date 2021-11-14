@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MetaDslx.Modeling;
+using UML_Diagram_Designer.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UML_Diagram_Designer_Test
 {
@@ -12,7 +10,8 @@ namespace UML_Diagram_Designer_Test
         [TestMethod]
         public void TestCreateClassMethod()
         {
-           
+
+
         }
         [TestMethod]
         public void TestCreateInterfaeMethod()
@@ -35,7 +34,7 @@ namespace UML_Diagram_Designer_Test
 
         }
         [TestMethod]
-        public void TestCreateParaeterMethod()
+        public void TestCreateParameterMethod()
         {
 
         }

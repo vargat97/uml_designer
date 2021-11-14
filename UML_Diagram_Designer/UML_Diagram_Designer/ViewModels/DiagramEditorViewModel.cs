@@ -269,6 +269,19 @@ namespace UML_Diagram_Designer.ViewModels
             this.PublishEvent();
 
         }
+
+        /// <summary>
+        /// Removes the selected Parameter from the model
+        /// </summary>
+        public void RemoveParameterFromModel()
+        {
+            var immutableObject = DetailsObject;
+            var immutableModel = this._functions.RemoveParameterFromModel((Parameter)immutableObject);
+            this._immutableModel = immutableModel;
+            DetailsObject = null;
+            this.PublishEvent();
+        }
+
         /// <summary>
         /// If the nodelayout's nodeobject is not abstract, than set it as abstarct
         /// </summary>
@@ -296,6 +309,14 @@ namespace UML_Diagram_Designer.ViewModels
             var immutableModel = this._functions.AddNewParameterToOperation(operationObject);
             this._immutableModel = immutableModel;
             this.PublishEvent();
+        }
+        /// <summary>
+        /// Opens a new "tab" on diagramEditorView, where user can edit the selected Paramater
+        /// </summary>
+        /// <param name="parameter"></param>
+        public void OpenEditParameter(object parameter)
+        {
+            DetailsObject = (Parameter)parameter;
         }
 
         /// <summary>
@@ -328,7 +349,22 @@ namespace UML_Diagram_Designer.ViewModels
 
 
 
+        public void ChangeObjectType(ComboBox sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 0) return;
+            var addedItem = (ImmutableObject)e.AddedItems[0];
+            ImmutableObject immutableObject = null;
+            if (NodeLayout != null) immutableObject = (ImmutableObject)NodeLayout.NodeObject;
+            else if (EdgeLayout != null) immutableObject = (ImmutableObject)EdgeLayout.EdgeObject;
+            else if (DetailsObject != null) immutableObject = DetailsObject;
 
+            if (immutableObject == null) return;
+            this._functions = new Functions(this._immutableModel);
+            var immutableModel = this._functions.ModifyObjectType(immutableObject, addedItem);
+
+            this._immutableModel = immutableModel;
+            this.PublishEvent();
+        }
 
 
 

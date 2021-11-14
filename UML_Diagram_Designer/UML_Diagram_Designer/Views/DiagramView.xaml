@@ -16,6 +16,7 @@
         <models:AttributeVisibilityConverter x:Key="attributeVisibilityConverter" />
         <models:OperationVisibilityConverter x:Key="opertaionVisibilityConverter" />
         <models:EnumVisibilityConverter x:Key="enumVisibilityConverter" />
+        
         <DataTemplate x:Key="ClassNodeTemplate" >
             <Canvas>
                 <Border Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top}" Background="Aquamarine" Width="100"
@@ -194,7 +195,7 @@
             </Canvas>
         </DataTemplate>
         <DataTemplate x:Key="InterfaceRealizationEdgeTemplate">
-            <Canvas>
+            <Canvas MouseMove="{s:Action EdgeHover}">
                 <Path Stroke="Black" StrokeThickness="1.5">
                     <Path.Data>
                         <PathGeometry Figures="{Binding TrianglePath.Figures}"/>
