@@ -1,6 +1,8 @@
 ﻿using MetaDslx.Modeling;
 using UML_Diagram_Designer.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UML_Diagram_Designer.ViewModels;
+using Stylet;
 
 namespace UML_Diagram_Designer_Test
 {
@@ -71,7 +73,6 @@ namespace UML_Diagram_Designer_Test
         [TestMethod]
         public void TestModifyObjectVisibilityMethod()
         {
-
         }
         [TestMethod]
         public void TestRemoveClassMethod()
