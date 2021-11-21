@@ -19,7 +19,7 @@ namespace UML_Diagram_Designer.ViewModels
 
         private ImmutableObject _relationShipObject;
         private List<ImmutableObject> _modelstypes;
-        private IEventAggregator _eventAggregator;
+        private readonly IEventAggregator _eventAggregator;
         private NodeLayout _nodeLayout;
         private EdgeLayout _edgeLayout;
         private ImmutableObject _detailsObject;
@@ -58,6 +58,12 @@ namespace UML_Diagram_Designer.ViewModels
             {
                 SetAndNotify(ref this._detailsObject, value);
             }
+        }
+
+        public ImmutableModel ImmutableModel
+        {
+            get { return this._immutableModel; }
+            set { this._immutableModel = value; }
         }
 
         public ImmutableObject RelationShipObject
@@ -471,7 +477,7 @@ namespace UML_Diagram_Designer.ViewModels
 
         public void CreateClass()
         {
-            var immutableModel = this._createClass();
+            var immutableModel = this._functions.CreateClass();
             this._immutableModel = immutableModel;
             this.PublishEvent();
         }

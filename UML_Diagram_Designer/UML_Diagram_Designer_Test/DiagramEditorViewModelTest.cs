@@ -1,8 +1,10 @@
-﻿using MetaDslx.Modeling;
-using UML_Diagram_Designer.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UML_Diagram_Designer.ViewModels;
 using Stylet;
+using Autofac.Extras.Moq;
+using Moq;
+using System.Linq;
+using MetaDslx.Modeling;
 
 namespace UML_Diagram_Designer_Test
 {
@@ -10,11 +12,32 @@ namespace UML_Diagram_Designer_Test
     public class DiagramEditorViewModelTest
     {
         [TestMethod]
-        public void TestCreateClassMethod()
+        public void TestCreateClassMethod_ValidCall()
         {
+            using (var mock = AutoMock.GetLoose())
+            {
+                var immutableModel = GetModelSample();
+                var eventAggregatorMock = mock.Create<EventAggregator>();
 
+                var diagramEditorViewModelMock = mock.Mock<DiagramEditorViewModel>();
+                diagramEditorViewModelMock.CreateClass();
 
+                var expected = 1;
+                var actual = diagramEditorViewModelMock.ImmutableModel.Objects.Count();
+
+                //var expected = GetModelSample().ToMutable().Name;
+                //var actual = diagramEditorViewModelMock.ImmutableModel.ToMutable().Name;
+                Assert.AreEqual(expected, actual);
+
+            }
         }
+        private static ImmutableModel GetModelSample()
+        {
+            var mutableModel = new MutableModel();
+            mutableModel.Name = "UnitTest";
+            return mutableModel.ToImmutable();
+        }
+
         [TestMethod]
         public void TestCreateInterfaeMethod()
         {

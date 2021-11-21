@@ -564,6 +564,31 @@ namespace UML_Diagram_Designer.Models
             return this._immutableModel;
         }
 
+        public ImmutableModel CreateClass()
+        {
+            var classObject = this.CreateClassObject();
+            var mutableModel = this._immutableModel.ToMutable();
+
+            mutableModel.ResolveObject(classObject.MId);
+            mutableModel.MergeObjects(mutableModel.GetObject(classObject), classObject.ToMutable());
+            this._immutableModel = mutableModel.ToImmutable();
+
+            return this._immutableModel;
+        }
+
+        private ImmutableObject CreateClassObject()
+        {
+            var personGenerator = new PersonNameGenerator();
+            var name = personGenerator.GenerateRandomFirstAndLastName();
+
+            var mutableModel = this._immutableModel.ToMutable();
+            var factory = new UmlFactory(mutableModel);
+            var classBuilder = factory.Class();
+            classBuilder.MName = name;
+
+            return classBuilder.ToImmutable();
+        }
+
         /// <summary>
         /// Creates a new EnumearationLiteral for the enumObject with a random name
         /// </summary>
@@ -603,6 +628,7 @@ namespace UML_Diagram_Designer.Models
             return enumerationLiteralBuilder.ToImmutable();
             
         }
+
 
         public ImmutableObject CreateAssociation()
         {
