@@ -34,6 +34,12 @@ namespace UML_Diagram_Designer.ViewModels
             get;
             set;
         }
+
+        public Brush EdgeHoverStroke
+        {
+            get; set;
+        }
+
         public Point CanvasSize
         {
             get { return this._canvasSize; }
@@ -42,7 +48,7 @@ namespace UML_Diagram_Designer.ViewModels
                 SetAndNotify(ref this._canvasSize, value);
             }
         }
-        private ImmutableModel ImmutableModel
+        public ImmutableModel ImmutableModel
         {
             get { return this._immutableModel; }
             set
@@ -72,7 +78,7 @@ namespace UML_Diagram_Designer.ViewModels
             }
         }
 
-        public DiagramViewModel(ImmutableModel immutableModel,DiagramEditorViewModel diagramEditorViewModel,IEventAggregator eventAggregator)
+        public DiagramViewModel(ImmutableModel immutableModel, DiagramEditorViewModel diagramEditorViewModel, IEventAggregator eventAggregator)
         {
             eventAggregator.Subscribe(this);
             this._diagramEditorViewModel = diagramEditorViewModel;
@@ -80,6 +86,7 @@ namespace UML_Diagram_Designer.ViewModels
             GraphLayout = this.LoadLayoutFromModel();
             Scale = 1;
             CreateEdgeLine = new Line();
+            EdgeHoverStroke = Brushes.Transparent;
         }
         public void CanvasSizeChanged(Panel sender, SizeChangedEventArgs e)
         {
@@ -98,6 +105,7 @@ namespace UML_Diagram_Designer.ViewModels
         }
         public void SelectNode(object sender, MouseButtonEventArgs e)
         {
+            if (e.Handled) return;
             var relativeTo = (FrameworkElement)sender;
             var datacontext = relativeTo.DataContext;
             NodeLayout layout = (NodeLayout)datacontext;
@@ -105,11 +113,12 @@ namespace UML_Diagram_Designer.ViewModels
             if (_diagramEditorViewModel.IsCreateRealtionShip)
             {
                 var p = layout.Position;
-                this.DrawCreateEdgeLine(new Point(p.X,p.Y));
+                this.DrawCreateEdgeLine(new Point(p.X, p.Y));
                 return;
             }
 
             this._diagramEditorViewModel.EdgeLayout = null;
+            this._diagramEditorViewModel.DetailsObject = null;
             layout.Selected = true;
             object layoutInstance = Convert.ChangeType(layout, datacontext.GetType());
 
@@ -120,7 +129,7 @@ namespace UML_Diagram_Designer.ViewModels
         {
             if (!this._diagramEditorViewModel.IsCreateRealtionShip) return;
 
-            var my_sender = (FrameworkElement)sender;
+            var my_sender = (Grid)sender;
             var datacontext = my_sender.DataContext;
             NodeLayout layout = (NodeLayout)datacontext;
 
@@ -140,37 +149,51 @@ namespace UML_Diagram_Designer.ViewModels
             var relativeTo = (FrameworkElement)sender;
             var p = e.GetPosition(relativeTo);
 
-            CreateEdgeLine.X2 = p.X;
-            CreateEdgeLine.Y2 = p.Y;
+
+
+            CreateEdgeLine.X2 = p.X - 100;
+            CreateEdgeLine.Y2 = p.Y - 50;
 
         }
 
         public void SelectEdge(object sender, MouseButtonEventArgs e)
         {
             this._diagramEditorViewModel.NodeLayout = null;
+            this._diagramEditorViewModel.DetailsObject = null;
             var datacontext = (((Path)sender).DataContext);
             var layout = (EdgeLayout)datacontext;
-            object layoutInstance = Convert.ChangeType(layout, datacontext.GetType());    
+            object layoutInstance = Convert.ChangeType(layout, datacontext.GetType());
 
             this._diagramEditorViewModel.EdgeLayout = (EdgeLayout)layoutInstance;
         }
 
         public void TextBlockClick(object sender, MouseButtonEventArgs e)
         {
+            e.Handled = true;
             this._diagramEditorViewModel.NodeLayout = null;
             var datacontext = (((TextBlock)sender).DataContext);
             this._diagramEditorViewModel.DetailsObject = (Property)datacontext;
         }
         public void SelectOperation(object sender, MouseButtonEventArgs e)
         {
+            e.Handled = true;
             this._diagramEditorViewModel.NodeLayout = null;
             var datacontext = (((TextBlock)sender).DataContext);
             this._diagramEditorViewModel.DetailsObject = (Operation)datacontext;
         }
+
+        public void SelectEnumerationLiteral(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+            this._diagramEditorViewModel.NodeLayout = null;
+            this._diagramEditorViewModel.EdgeLayout = null;
+            var datacontext = (((TextBlock)sender).DataContext);
+            this._diagramEditorViewModel.DetailsObject = (EnumerationLiteral)datacontext;
+        }
         public void Handle(ImmutableModelChangedEvent message)
         {
             ImmutableModel = message.ImmutableModel;
-            
+
         }
         public void ZoomOut()
         {
@@ -232,6 +255,11 @@ namespace UML_Diagram_Designer.ViewModels
             graphLayout.ComputeLayout();
 
             return graphLayout;
+        }
+
+        public void EdgeHover()
+        {
+            EdgeHoverStroke = Brushes.Green;
         }
         /*
         

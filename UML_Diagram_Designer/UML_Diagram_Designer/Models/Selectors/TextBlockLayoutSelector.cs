@@ -21,6 +21,12 @@ namespace UML_Diagram_Designer.Models
                 else if (itemType.Name == "OperationImpl")
                     return
                         element.FindResource("OperationImplTemplate") as DataTemplate;
+                else if (itemType.Name == "EnumerationLiteralImpl")
+                    return
+                        element.FindResource("EnumerationLiteralImplTemplate") as DataTemplate;
+                else if (itemType.Name == "ParameterImpl")
+                    return
+                        element.FindResource("ParameterImplTemplate") as DataTemplate;
                 else
                     return
                        element.FindResource("EnumNodeTemplate") as DataTemplate;

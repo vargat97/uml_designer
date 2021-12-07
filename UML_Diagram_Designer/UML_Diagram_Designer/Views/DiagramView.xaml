@@ -16,6 +16,7 @@
         <models:AttributeVisibilityConverter x:Key="attributeVisibilityConverter" />
         <models:OperationVisibilityConverter x:Key="opertaionVisibilityConverter" />
         <models:EnumVisibilityConverter x:Key="enumVisibilityConverter" />
+        
         <DataTemplate x:Key="ClassNodeTemplate" >
             <Canvas>
                 <Border Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top}" Background="Aquamarine" Width="100"
@@ -48,7 +49,6 @@
                                         <Grid>
                                             <TextBlock MouseLeftButtonDown="{s:Action TextBlockClick}">
                                                 <TextBlock.Text>
-
                                                     <MultiBinding Converter="{StaticResource attributeVisibilityConverter}">
                                                         <Binding Path="Visibility" />
                                                         <Binding Path="MName" />
@@ -73,7 +73,6 @@
                                                         <Binding Path="MName" />
                                                         <Binding Path="OwnedParameter" />
                                                     </MultiBinding>
-
                                                 </TextBlock.Text>
                                             </TextBlock>
                                         </Grid>
@@ -97,13 +96,24 @@
                             <RowDefinition Height="auto" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="{Binding NodeObject.MName}" />
+                        <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="{Binding NodeObject.MName}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" >
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding NodeObject.IsAbstract, Mode=OneWay}"
+                                                 Value="True">
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                         <Separator VerticalAlignment="Center" Grid.Row="1"/>
                         <ItemsControl ItemsSource="{Binding AllAttributes }" Grid.Row="2">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <TextBlock>
+                                        <TextBlock MouseLeftButtonDown="{s:Action TextBlockClick}">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource attributeVisibilityConverter}">
                                                     <Binding Path="Visibility" />
@@ -121,7 +131,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <TextBlock>
+                                        <TextBlock MouseLeftButtonDown="{s:Action SelectOperation}">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource opertaionVisibilityConverter}">
                                                     <Binding Path="Visibility"/>
@@ -166,7 +176,7 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Grid>
-                                            <TextBlock>
+                                            <TextBlock MouseLeftButtonDown="{s:Action SelectEnumerationLiteral}">
                                                 <TextBlock.Text>
                                                     <MultiBinding Converter="{StaticResource enumVisibilityConverter}">
                                                         <Binding Path="Visibility" />
@@ -185,18 +195,18 @@
             </Canvas>
         </DataTemplate>
         <DataTemplate x:Key="InterfaceRealizationEdgeTemplate">
-            <Canvas>
-                <Path Stroke="DarkOrange" StrokeThickness="1.5">
+            <Canvas MouseMove="{s:Action EdgeHover}">
+                <Path Stroke="Black" StrokeThickness="1.5">
                     <Path.Data>
                         <PathGeometry Figures="{Binding TrianglePath.Figures}"/>
                     </Path.Data>
                 </Path>
-                <Path Stroke="Wheat" StrokeThickness="6" MouseLeftButtonDown="{s:Action SelectEdge}" >
+                <Path Stroke="Transparent" StrokeThickness="6" MouseLeftButtonDown="{s:Action SelectEdge}" >
                     <Path.Data>
                         <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
                     </Path.Data>
                 </Path>
-                <Path Stroke="DarkOrange" StrokeThickness="1.5" StrokeDashArray="2, 4" >
+                <Path Stroke="Black" StrokeThickness="1.5" StrokeDashArray="2, 4" >
                     <Path.Data>
                         <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
                     </Path.Data>
@@ -210,7 +220,7 @@
                         <PathGeometry Figures="{Binding TrianglePath.Figures}"/>
                     </Path.Data>
                 </Path>
-                <Path Stroke="Transparent" StrokeThickness="4" MouseLeftButtonDown="{s:Action SelectEdge}" >
+                <Path Stroke="Transparent" StrokeThickness="6" MouseLeftButtonDown="{s:Action SelectEdge}" >
                     <Path.Data>
                         <PathGeometry Figures="{Binding PathGeometry.Figures}"/>
                     </Path.Data>

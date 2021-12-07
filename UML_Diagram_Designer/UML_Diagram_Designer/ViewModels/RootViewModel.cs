@@ -5,26 +5,35 @@ using Microsoft.CodeAnalysis;
 using Microsoft.Win32;
 using Stylet;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using UML_Diagram_Designer.Models;
 
 namespace UML_Diagram_Designer.ViewModels
 {
-    public class RootViewModel: Conductor<object>.Collection.OneActive
+    public class RootViewModel : Conductor<object>.Collection.OneActive
     {
         private DiagramViewModel _diagramViewModel;
         private DiagramEditorViewModel _diagramEditorViewModel;
 
+        private bool _isDirty = false;
         public void OpenFile()
         {
+            if (_isDirty)
+            {
+                this.SaveDialogOpen(true);
+            }
+
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if(openFileDialog.ShowDialog() == true)
             {
 
-                var model = this.ReadUMLModelFromWhiteStarUmlFile(openFileDialog.FileName);
+                var model = this.ReadUMLModelFromWhiteStarUmlFile(openFileDialog);
                 EventAggregator eventAggregator = new EventAggregator();
                 this._diagramEditorViewModel = new DiagramEditorViewModel(model, eventAggregator);
                 this._diagramViewModel = new DiagramViewModel(model,this._diagramEditorViewModel,eventAggregator);
@@ -32,12 +41,19 @@ namespace UML_Diagram_Designer.ViewModels
                 this.Items.Add(this._diagramViewModel);
                 this.Items.Add(this._diagramEditorViewModel);
 
+                this._isDirty = true;
+
             }
             
         }
 
         public void CreateNewModel()
         {
+            if (_isDirty)
+            {
+                this.SaveDialogOpen(true);
+            }
+
 
             var mutablemodel = new MutableModel();
             var model = mutablemodel.ToImmutable();
@@ -53,10 +69,37 @@ namespace UML_Diagram_Designer.ViewModels
         {
             System.Windows.Application.Current.Shutdown();
         }
+        public void SaveModel()
+        {
+            if (!_isDirty) return;
+            this.SaveDialogOpen(false);
+        }
+        private void SaveDialogOpen(bool closeAfterNotSave)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.DefaultExt = ".xmi";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string fileName = saveFileDialog.FileName;
+                UmlXmiSerializer serializer = new UmlXmiSerializer();
+                serializer.WriteModelToFile(fileName, _diagramViewModel.ImmutableModel);
+            }
+            if (!closeAfterNotSave) return;
+            this.Items.Remove(this._diagramViewModel);
+            this.Items.Remove(this._diagramEditorViewModel);
+        }
+        private ImmutableModel ReadUMLModelFromWhiteStarUmlFile(OpenFileDialog dialog)
+        {
 
-        private ImmutableModel ReadUMLModelFromWhiteStarUmlFile(string fileName)
+            if (Path.GetExtension(dialog.FileName) == ".uml") return this.ReadFromUMLFile(dialog.FileName);
+            else if (Path.GetExtension(dialog.FileName) == ".xmi") return this.ReadFromXMIFile(dialog.FileName);
+            return null;
+        }
+
+        private ImmutableModel ReadFromUMLFile(string fileName)
         {
             UmlDescriptor.Initialize();
+
             var umlSerializer = new WhiteStarUmlSerializer();
             var model = umlSerializer.ReadModelFromFile(fileName, out var diagnostics);
 
@@ -69,6 +112,15 @@ namespace UML_Diagram_Designer.ViewModels
             {
                 Console.WriteLine(df.Format(diagnostics[i]));
             }
+
+            return model;
+        }
+
+        private ImmutableModel ReadFromXMIFile(string fileName)
+        {
+            UmlDescriptor.Initialize();
+            var xmiSerializer = new UmlXmiSerializer();
+            var model = xmiSerializer.ReadModelFromFile(fileName);
 
             return model;
         }

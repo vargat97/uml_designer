@@ -42,10 +42,19 @@ namespace UML_Diagram_Designer.Models
         public double X { get; }
         public double Y { get; }
 
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
         public static bool operator ==(Point2D left, Point2D right)
         {
             return left.X == right.X && left.Y == right.Y;
         }
+        
 
         public static bool operator !=(Point2D left, Point2D right)
         {
