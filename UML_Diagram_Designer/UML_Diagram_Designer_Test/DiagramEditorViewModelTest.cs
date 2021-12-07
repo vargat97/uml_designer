@@ -5,6 +5,9 @@ using Autofac.Extras.Moq;
 using Moq;
 using System.Linq;
 using MetaDslx.Modeling;
+using UML_Diagram_Designer.Models;
+using System.Windows.Controls;
+using System.Windows;
 
 namespace UML_Diagram_Designer_Test
 {
@@ -14,43 +17,92 @@ namespace UML_Diagram_Designer_Test
         [TestMethod]
         public void TestCreateClassMethod_ValidCall()
         {
+
             using (var mock = AutoMock.GetLoose())
             {
-                var immutableModel = GetModelSample();
+                //Arrange
+                var mutablemodel = new MutableModel();
+                var immutablemodel = mutablemodel.ToImmutable();
                 var eventAggregatorMock = mock.Create<EventAggregator>();
+                var diagramEditorViewModel = new DiagramEditorViewModel(immutablemodel, eventAggregatorMock);
 
-                var diagramEditorViewModelMock = mock.Mock<DiagramEditorViewModel>();
-                diagramEditorViewModelMock.CreateClass();
-
+                var expected_null = 0;
                 var expected = 1;
-                var actual = diagramEditorViewModelMock.ImmutableModel.Objects.Count();
+                var expected_class = "Class";
 
-                //var expected = GetModelSample().ToMutable().Name;
-                //var actual = diagramEditorViewModelMock.ImmutableModel.ToMutable().Name;
-                Assert.AreEqual(expected, actual);
+                //Act
+                var actual_null = diagramEditorViewModel.ImmutableModel.Objects.Count();
+                diagramEditorViewModel.CreateClass();
+                var actual = diagramEditorViewModel.ImmutableModel.Objects.Count();
+                var actual_metaclass = diagramEditorViewModel.ImmutableModel.Objects.First().MMetaClass;
 
+                //Assert
+                Assert.AreEqual(expected_null, actual_null,"The base model already has an object");
+                Assert.AreEqual(expected, actual, "ViewModel's CreateClass could not create object");
+                Assert.AreEqual(expected_class, actual_metaclass.MName, "ViewModel's CreateClass could not create Class object");
             }
-        }
-        private static ImmutableModel GetModelSample()
-        {
-            var mutableModel = new MutableModel();
-            mutableModel.Name = "UnitTest";
-            return mutableModel.ToImmutable();
         }
 
         [TestMethod]
         public void TestCreateInterfaeMethod()
         {
+            var mutablemodel = new MutableModel();
+            var immutablemodel = mutablemodel.ToImmutable();
+
+            using (var mock = AutoMock.GetLoose())
+            {
+                var eventAggregatorMock = mock.Create<EventAggregator>();
+
+                var diagramEditorViewModel = new DiagramEditorViewModel(immutablemodel, eventAggregatorMock);
+
+                var expected_null = 0;
+                var actual_null = diagramEditorViewModel.ImmutableModel.Objects.Count();
+
+                var expected = 1;
+                diagramEditorViewModel.CreateInterface();
+                var actual = diagramEditorViewModel.ImmutableModel.Objects.Count();
+
+                var expected_class = "Interface";
+                var actual_metaclass = diagramEditorViewModel.ImmutableModel.Objects.First().MMetaClass;
+
+
+                Assert.AreEqual(expected_null, actual_null, "The base model already has an object");
+                Assert.AreEqual(expected, actual, "ViewModel's CreateInterface could not create object");
+                Assert.AreEqual(expected_class, actual_metaclass.MName, "ViewModel's CreateInterface could not create Interface object");
+            }
 
         }
         [TestMethod]
         public void TestCreateEnumerationMethod()
         {
+            var mutablemodel = new MutableModel();
+            var immutablemodel = mutablemodel.ToImmutable();
 
+            using (var mock = AutoMock.GetLoose())
+            {
+                var eventAggregatorMock = mock.Create<EventAggregator>();
+
+                var diagramEditorViewModel = new DiagramEditorViewModel(immutablemodel, eventAggregatorMock);
+
+                var expected_null = 0;
+                var actual_null = diagramEditorViewModel.ImmutableModel.Objects.Count();
+
+                var expected = 1;
+                diagramEditorViewModel.CreateEnum();
+                var actual = diagramEditorViewModel.ImmutableModel.Objects.Count();
+
+                var expected_class = "Enumeration";
+                var actual_metaclass = diagramEditorViewModel.ImmutableModel.Objects.First().MMetaClass;
+
+
+                Assert.AreEqual(expected_null, actual_null, "The base model already has an object");
+                Assert.AreEqual(expected, actual, "ViewModel's CreateEnum could not create object");
+                Assert.AreEqual(expected_class, actual_metaclass.MName, "ViewModel's CreateEnum could not create Enumeration object");
+            }
         }
         [TestMethod]
         public void TestCreateAttributeMethod()
-        {
+        { 
 
         }
         [TestMethod]
@@ -71,6 +123,8 @@ namespace UML_Diagram_Designer_Test
         [TestMethod]
         public void TestCreateAssociationMethod()
         {
+
+
 
         }
         [TestMethod]
